@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .page-header h1 { font-size: 24px; color: #1a1a2e; }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .search-box input {
+            border: none;
+            padding: 10px;
+            width: 250px;
+            outline: none;
+            font-size: 14px;
+        }
+        .search-box button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { background: #c0392b; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .product-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .product-table th, .product-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .product-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        .product-table td { font-size: 13px; }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .filter-bar select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .empty-row { text-align: center; padding: 40px; color: #999; }
+        @media (max-width: 992px) { .product-table { display: block; overflow-x: auto; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-box"></i> Quản lý sản phẩm</h1>
+                <div style="display: flex; gap: 15px;">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
+                        <button onclick="searchProducts()"><i class="fas fa-search"></i></button>
+                    </div>
+                    <a href="/admin/products/create" class="btn-primary"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+                </div>
+            </div>
+            
+            <div class="filter-bar">
+                <select id="categoryFilter" onchange="filterProducts()">
+                    <option value="">Tất cả danh mục</option>
+                    <% for(var i = 0; i < categories.length; i++) { %>
+                        <option value="<%= categories[i].name %>"><%= categories[i].name %></option>
+                    <% } %>
+                </select>
+                <select id="stockFilter" onchange="filterProducts()">
+                    <option value="">Tất cả tồn kho</option>
+                    <option value="low">Còn ít (< 10)</option>
+                    <option value="out">Hết hàng (0)</option>
+                    <option value="in">Còn hàng (> 0)</option>
+                </select>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="product-table" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Danh mục</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Đã bán</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+    <% for(var i = 0; i < products.length; i++) { %>
+    <tr>
+        <td>
+            <div class="product-image">
+                <% if (products[i].image) { %>
+                    <img src="<%= products[i].image %>" alt="<%= products[i].name %>">
+                <% } else { %>
+                    <i class="fas fa-desktop"></i>
+                <% } %>
+            </div>
+        </td>
+        <td>
+            <strong><%= products[i].name %></strong>
+            <% if (products[i].brand) { %>
+                <br><small style="color:#e74c3c;font-size:11px;">
+                    <i class="fas fa-tag"></i> <%= products[i].brand %>
+                </small>
+            <% } %>
+        </td>
+        <td>
+            <% if (products[i].categories && products[i].categories.length > 0) { %>
+                <%= products[i].categories.map(c => c.name).join(', ') %>
+            <% } else { %>
+                <span style="color:#999;">Chưa phân loại</span>
+            <% } %>
+        </td>
+        <td style="color:#e74c3c;font-weight:600;">
+            <%= products[i].price.toLocaleString('vi-VN') %>đ
+        </td>
+        <td style="text-align:center;">
+            <% if (products[i].stock === 0) { %>
+                <span style="background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;">0</span>
+            <% } else if (products[i].stock <= 10) { %>
+                <span style="background:#fff3cd;color:#856404;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;"><%= products[i].stock %></span>
+            <% } else { %>
+                <span style="background:#d4edda;color:#155724;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;"><%= products[i].stock %></span>
+            <% } %>
+        </td>
+        <td style="text-align:center;font-weight:500;"><%= products[i].soldCount %></td>
+        <td>
+            <a href="/admin/products/edit/<%= products[i]._id %>" class="btn-secondary"><i class="fas fa-edit"></i> Sửa</a>
+            <form method="POST" action="/admin/products/<%= products[i]._id %>?_method=DELETE" style="display:inline;" onsubmit="return confirm('Xóa sản phẩm này?')">
+                <button type="submit" class="btn-danger"><i class="fas fa-trash"></i> Xóa</button>
+            </form>
+        </td>
+    </tr>
+    <% } %>
+</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchProducts() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#productsTableBody tr');
+            let hasResults = false;
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchText)) { row.style.display = ''; hasResults = true; }
+                else { row.style.display = 'none'; }
+            });
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+            if (!hasResults && searchText !== '') {
+                const tbody = document.getElementById('productsTableBody');
+                const newRow = document.createElement('tr');
+                newRow.id = 'noResultRow';
+                newRow.innerHTML = '<td colspan="7" class="empty-row">Không tìm thấy sản phẩm nào</div>';
+                tbody.appendChild(newRow);
+            }
+        }
+        
+        function filterProducts() {
+            const category = document.getElementById('categoryFilter').value;
+            const stock = document.getElementById('stockFilter').value;
+            const rows = document.querySelectorAll('#productsTableBody tr');
+            let hasResults = false;
+            rows.forEach(row => {
+                if (row.id === 'noResultRow') return;
+                const categoryCell = row.cells[2]?.innerText || '';
+                const stockCell = parseInt(row.cells[4]?.innerText) || 0;
+                let show = true;
+                if (category && !categoryCell.includes(category)) show = false;
+                if (stock === 'low' && stockCell >= 10) show = false;
+                if (stock === 'out' && stockCell > 0) show = false;
+                if (stock === 'in' && stockCell === 0) show = false;
+                row.style.display = show ? '' : 'none';
+                if (show) hasResults = true;
+            });
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+            if (!hasResults) {
+                const tbody = document.getElementById('productsTableBody');
+                const newRow = document.createElement('tr');
+                newRow.id = 'noResultRow';
+                newRow.innerHTML = '<td colspan="7" class="empty-row">Không tìm thấy sản phẩm nào</div>';
+                tbody.appendChild(newRow);
+            }
+        }
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchProducts();
+        });
+    </script>
+</body>
+</html>

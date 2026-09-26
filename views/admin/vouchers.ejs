@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý mã giảm giá - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .page-header h1 { font-size: 24px; color: #1a1a2e; }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .search-box input {
+            border: none;
+            padding: 10px;
+            width: 250px;
+            outline: none;
+            font-size: 14px;
+        }
+        .search-box button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .btn-primary:hover { background: #c0392b; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-danger:hover { background: #c82333; }
+        /* Nút trạng thái */
+        .status-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .status-active {
+            background: #28a745;
+            color: white;
+        }
+        .status-active:hover {
+            background: #1e7e34;
+        }
+        .status-inactive {
+            background: #dc3545;
+            color: white;
+        }
+        .status-inactive:hover {
+            background: #bd2130;
+        }
+        .status-show {
+            background: #17a2b8;
+            color: white;
+        }
+        .status-show:hover {
+            background: #117a8b;
+        }
+        .status-hide {
+            background: #6c757d;
+            color: white;
+        }
+        .status-hide:hover {
+            background: #5a6268;
+        }
+        .voucher-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .voucher-table th, .voucher-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .voucher-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        .voucher-table td {
+            font-size: 13px;
+        }
+        .voucher-code { font-weight: 600; color: #e74c3c; }
+        .empty-row { text-align: center; padding: 50px; color: #999; }
+        @media (max-width: 992px) { .voucher-table { display: block; overflow-x: auto; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-ticket-alt"></i> Quản lý mã giảm giá</h1>
+                <div style="display: flex; gap: 15px;">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm mã giảm giá...">
+                        <button onclick="searchVouchers()"><i class="fas fa-search"></i></button>
+                    </div>
+                    <a href="/admin/vouchers/create" class="btn-primary"><i class="fas fa-plus"></i> Thêm mã mới</a>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="voucher-table" id="vouchersTable">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Tên</th>
+                            <th>Loại</th>
+                            <th>Giá trị</th>
+                            <th>Đơn tối thiểu</th>
+                            <th>Số lượt</th>
+                            <th>Thời hạn</th>
+                            <th>Trạng thái</th>
+                            <th>Hiển thị</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vouchersTableBody">
+                        <% if (vouchers && vouchers.length > 0) { %>
+                            <% for(var i = 0; i < vouchers.length; i++) { 
+                                var typeText = '';
+                                var valueText = '';
+                                if (vouchers[i].type === 'discount_percent') {
+                                    typeText = 'Giảm %';
+                                    valueText = vouchers[i].discountValue + '%';
+                                } else if (vouchers[i].type === 'discount_fixed') {
+                                    typeText = 'Giảm tiền';
+                                    valueText = vouchers[i].discountValue.toLocaleString('vi-VN') + 'đ';
+                                } else {
+                                    typeText = 'Miễn phí ship';
+                                    valueText = 'Miễn phí';
+                                }
+                            %>
+                            <tr>
+                                <td class="voucher-code"><%= vouchers[i].code %></td>
+                                <td><%= vouchers[i].name %></td>
+                                <td><%= typeText %></td>
+                                <td><%= valueText %></td>
+                                <td><%= vouchers[i].minOrderValue.toLocaleString('vi-VN') %>đ</div></td>
+                                <td><%= vouchers[i].usedCount %>/<%= vouchers[i].quantity === 0 ? '∞' : vouchers[i].quantity %></div></td>
+                                <td style="font-size:12px;">
+                                    <%= new Date(vouchers[i].startDate).toLocaleDateString('vi-VN') %><br>
+                                    → <%= new Date(vouchers[i].endDate).toLocaleDateString('vi-VN') %>
+                                </div>
+                                <td>
+                                    <button onclick="toggleActive('<%= vouchers[i]._id %>')" 
+                                        class="status-btn <%= vouchers[i].isActive ? 'status-active' : 'status-inactive' %>">
+                                        <%= vouchers[i].isActive ? 'Hoạt động' : 'Đã khóa' %>
+                                    </button>
+                                </div>
+                                <td>
+                                    <button onclick="toggleShow('<%= vouchers[i]._id %>')" 
+                                        class="status-btn <%= vouchers[i].showOnCheckout ? 'status-show' : 'status-hide' %>">
+                                        <%= vouchers[i].showOnCheckout ? 'Hiển thị' : 'Ẩn' %>
+                                    </button>
+                                </div>
+                                <td>
+                                    <a href="/admin/vouchers/edit/<%= vouchers[i]._id %>" class="btn-secondary">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <button onclick="deleteVoucher('<%= vouchers[i]._id %>')" class="btn-danger">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </div>
+                             </div>
+                            <% } %>
+                        <% } else { %>
+                            <tr><td colspan="10" class="empty-row">Chưa có mã giảm giá nào</div></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchVouchers() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#vouchersTableBody tr');
+            let hasResults = false;
+            rows.forEach(row => {
+                if (row.querySelector('td[colspan]')) return;
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchText)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+            if (!hasResults && searchText !== '') {
+                const tbody = document.getElementById('vouchersTableBody');
+                const newRow = document.createElement('tr');
+                newRow.id = 'noResultRow';
+                newRow.innerHTML = '<td colspan="10" class="empty-row">Không tìm thấy mã giảm giá nào</div>';
+                tbody.appendChild(newRow);
+            }
+        }
+        
+        function toggleActive(id) {
+            fetch('/admin/vouchers/' + id + '/toggle-active', { method: 'PUT' })
+                .then(res => res.json())
+                .then(data => { 
+                    if(data.success) location.reload(); 
+                    else alert(data.message || 'Lỗi khi cập nhật trạng thái');
+                })
+                .catch(err => alert('Lỗi kết nối'));
+        }
+        
+        function toggleShow(id) {
+            fetch('/admin/vouchers/' + id + '/toggle-show', { method: 'PUT' })
+                .then(res => res.json())
+                .then(data => { 
+                    if(data.success) location.reload(); 
+                    else alert(data.message || 'Lỗi khi cập nhật hiển thị');
+                })
+                .catch(err => alert('Lỗi kết nối'));
+        }
+        
+        function deleteVoucher(id) {
+            if(confirm('Bạn có chắc muốn xóa mã giảm giá này?')) {
+                fetch('/admin/vouchers/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => { 
+                    if(data.success) location.reload(); 
+                    else alert(data.message || 'Xóa thất bại');
+                })
+                .catch(err => alert('Lỗi kết nối'));
+            }
+        }
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchVouchers();
+        });
+    </script>
+</body>
+</html>

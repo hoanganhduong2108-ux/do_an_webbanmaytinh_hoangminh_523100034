@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - PC MDZ Staff</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 25px; color: #ccc; text-decoration: none; transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+        }
+        .page-header h1 { font-size: 24px; color: #1a1a2e; }
+        .search-box {
+            display: flex; gap: 10px; background: white; padding: 5px 15px;
+            border-radius: 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .search-box input { border: none; padding: 10px; width: 250px; outline: none; font-size: 14px; }
+        .search-box button { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 16px; }
+        
+        .notice-box {
+            background: #e3f2fd; border-left: 4px solid #2196f3;
+            padding: 12px 20px; border-radius: 8px; margin-bottom: 20px;
+            color: #1565c0; font-size: 14px;
+        }
+        .notice-box i { margin-right: 8px; }
+        
+        .filter-bar {
+            display: flex; gap: 15px; margin-bottom: 20px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar select {
+            padding: 8px 15px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 14px;
+        }
+        .filter-bar label { font-size: 14px; color: #555; font-weight: 500; }
+        
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 15px; margin-bottom: 20px;
+        }
+        .stat-mini {
+            background: white; padding: 15px; border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .stat-mini-icon {
+            width: 45px; height: 45px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .stat-mini-info h4 { font-size: 12px; color: #666; margin-bottom: 3px; font-weight: 500; }
+        .stat-mini-info .value { font-size: 20px; font-weight: bold; color: #1a1a2e; }
+        
+        .customer-table {
+            width: 100%; background: white; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .customer-table th, .customer-table td {
+            padding: 14px 12px; text-align: left; border-bottom: 1px solid #eee;
+        }
+        .customer-table th {
+            background: #f8f9fa; font-weight: 600;
+            color: #555; font-size: 13px;
+        }
+        .customer-table td { font-size: 13px; }
+        .customer-table tbody tr:hover { background: #fafafa; }
+        
+        .customer-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        
+        .customer-name { font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
+        .customer-email { font-size: 12px; color: #666; }
+        
+        .customer-contact { font-size: 12px; color: #666; line-height: 1.6; }
+        .customer-contact i { width: 14px; color: #e74c3c; }
+        
+        .status-badge {
+            padding: 5px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 500;
+            display: inline-block;
+        }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+        .status-vip { background: #fff3cd; color: #856404; }
+        
+        .points-badge {
+            background: #fce4ec; color: #c2185b;
+            padding: 3px 8px; border-radius: 12px;
+            font-size: 11px; font-weight: 600;
+        }
+        
+        .empty-row { text-align: center; padding: 50px; color: #999; }
+        .empty-row i { font-size: 40px; margin-bottom: 10px; display: block; color: #ddd; }
+        
+        @media (max-width: 992px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .customer-table { display: block; overflow-x: auto; }
+        }
+        @media (max-width: 576px) {
+            .stats-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <%- include('../partials/staff-sidebar', { currentPage: 'customers' }) %>
+        
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-users"></i> Danh sách khách hàng</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm khách hàng...">
+                    <button onclick="searchCustomers()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- Thông báo quyền hạn -->
+            <div class="notice-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Chế độ chỉ xem:</strong> Nhân viên bán hàng chỉ có thể xem thông tin khách hàng để hỗ trợ tư vấn. 
+                Việc khóa/mở khóa/xóa tài khoản chỉ admin mới có quyền thực hiện.
+            </div>
+            
+            <!-- Thống kê nhanh -->
+            <div class="stats-row">
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:#e3f2fd;color:#2196f3;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>Tổng khách hàng</h4>
+                        <div class="value"><%= customers.length %></div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:#e8f5e9;color:#4caf50;">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>Đang hoạt động</h4>
+                        <div class="value">
+                            <%= customers.filter(c => c.isActive).length %>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:#fff3cd;color:#856404;">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>Khách VIP</h4>
+                        <div class="value">
+                            <%= customers.filter(c => (c.totalSpent || 0) >= 50000000).length %>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:#fce4ec;color:#c2185b;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-mini-info">
+                        <h4>Tổng điểm tích lũy</h4>
+                        <div class="value">
+                            <%= customers.reduce((sum, c) => sum + (c.points || 0), 0).toLocaleString('vi-VN') %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bộ lọc -->
+            <div class="filter-bar">
+                <label><i class="fas fa-filter"></i> Lọc:</label>
+                <select id="statusFilter" onchange="filterCustomers()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Đã khóa</option>
+                </select>
+                <select id="spentFilter" onchange="filterCustomers()">
+                    <option value="">Tất cả mức chi tiêu</option>
+                    <option value="vip">VIP (≥ 50 triệu)</option>
+                    <option value="high">Cao (10-50 triệu)</option>
+                    <option value="normal">Thường (< 10 triệu)</option>
+                    <option value="new">Khách mới (chưa mua)</option>
+                </select>
+                <select id="sortFilter" onchange="filterCustomers()">
+                    <option value="">Sắp xếp mặc định</option>
+                    <option value="spent_desc">Chi tiêu cao nhất</option>
+                    <option value="points_desc">Điểm cao nhất</option>
+                    <option value="newest">Mới đăng ký</option>
+                </select>
+                <button onclick="resetFilters()" style="background:#6c757d;color:white;padding:8px 15px;border:none;border-radius:8px;cursor:pointer;font-size:13px;">
+                    <i class="fas fa-times"></i> Xóa bộ lọc
+                </button>
+            </div>
+            
+            <!-- Bảng khách hàng -->
+            <div style="overflow-x: auto;">
+                <table class="customer-table" id="customersTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">STT</th>
+                            <th>Khách hàng</th>
+                            <th>Liên hệ</th>
+                            <th>Địa chỉ</th>
+                            <th style="text-align:center;">Điểm tích lũy</th>
+                            <th style="text-align:center;">Tổng chi tiêu</th>
+                            <th style="text-align:center;">Ngày đăng ký</th>
+                            <th style="text-align:center;">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        <% if (customers && customers.length > 0) { %>
+                            <% customers.forEach((c, i) => { 
+                                var isVip = (c.totalSpent || 0) >= 50000000;
+                                var statusClass = c.isActive ? 'status-active' : 'status-inactive';
+                                var statusText = c.isActive ? 'Hoạt động' : 'Đã khóa';
+                            %>
+                            <tr data-status="<%= c.isActive ? 'active' : 'inactive' %>"
+                                data-spent="<%= c.totalSpent || 0 %>"
+                                data-points="<%= c.points || 0 %>"
+                                data-created="<%= new Date(c.createdAt).getTime() %>">
+                                <td style="text-align:center;color:#666;font-weight:500;"><%= i + 1 %></td>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:10px;">
+                                        <div class="customer-avatar">
+                                            <%= c.fullName ? c.fullName.charAt(0).toUpperCase() : '?' %>
+                                        </div>
+                                        <div>
+                                            <div class="customer-name">
+                                                <%= c.fullName %>
+                                                <% if (isVip) { %>
+                                                    <i class="fas fa-crown" style="color:#ffc107;margin-left:5px;" title="Khách VIP"></i>
+                                                <% } %>
+                                            </div>
+                                            <div class="customer-email"><%= c.email %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="customer-contact">
+                                        <div><i class="fas fa-phone"></i> <%= c.phone %></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="customer-contact">
+                                        <i class="fas fa-map-marker-alt"></i> <%= c.address %>
+                                    </div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span class="points-badge">
+                                        <i class="fas fa-star"></i> <%= (c.points || 0).toLocaleString('vi-VN') %>
+                                    </span>
+                                </td>
+                                <td style="text-align:center;color:#e74c3c;font-weight:600;">
+                                    <%= (c.totalSpent || 0).toLocaleString('vi-VN') %>đ
+                                </td>
+                                <td style="text-align:center;color:#666;font-size:12px;">
+                                    <%= new Date(c.createdAt).toLocaleDateString('vi-VN') %>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span class="status-badge <%= statusClass %>">
+                                        <i class="fas fa-<%= c.isActive ? 'check-circle' : 'ban' %>"></i>
+                                        <%= statusText %>
+                                    </span>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" class="empty-row">
+                                    <i class="fas fa-users-slash"></i>
+                                    Chưa có khách hàng nào trong hệ thống
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function searchCustomers() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#customersTableBody tr');
+            let hasResults = false;
+            
+            rows.forEach(row => {
+                if (row.querySelector('.empty-row')) return;
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchText)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+            
+            if (!hasResults && searchText !== '') {
+                const tbody = document.getElementById('customersTableBody');
+                const newRow = document.createElement('tr');
+                newRow.id = 'noResultRow';
+                newRow.innerHTML = '<td colspan="8" class="empty-row"><i class="fas fa-search"></i>Không tìm thấy khách hàng nào</td>';
+                tbody.appendChild(newRow);
+            }
+        }
+        
+        function filterCustomers() {
+            const status = document.getElementById('statusFilter').value;
+            const spent = document.getElementById('spentFilter').value;
+            const sortBy = document.getElementById('sortFilter').value;
+            const rows = Array.from(document.querySelectorAll('#customersTableBody tr'));
+            
+            let hasResults = false;
+            
+            rows.forEach(row => {
+                if (row.querySelector('.empty-row')) return;
+                
+                const rowStatus = row.dataset.status;
+                const rowSpent = parseInt(row.dataset.spent) || 0;
+                
+                let show = true;
+                if (status && rowStatus !== status) show = false;
+                
+                if (spent === 'vip' && rowSpent < 50000000) show = false;
+                if (spent === 'high' && (rowSpent < 10000000 || rowSpent >= 50000000)) show = false;
+                if (spent === 'normal' && (rowSpent === 0 || rowSpent >= 10000000)) show = false;
+                if (spent === 'new' && rowSpent > 0) show = false;
+                
+                row.style.display = show ? '' : 'none';
+                if (show) hasResults = true;
+            });
+            
+            // Sắp xếp
+            if (sortBy && hasResults) {
+                const tbody = document.getElementById('customersTableBody');
+                const visibleRows = rows.filter(r => r.style.display !== 'none' && !r.querySelector('.empty-row'));
+                
+                visibleRows.sort((a, b) => {
+                    if (sortBy === 'spent_desc') {
+                        return parseInt(b.dataset.spent) - parseInt(a.dataset.spent);
+                    }
+                    if (sortBy === 'points_desc') {
+                        return parseInt(b.dataset.points) - parseInt(a.dataset.points);
+                    }
+                    if (sortBy === 'newest') {
+                        return parseInt(b.dataset.created) - parseInt(a.dataset.created);
+                    }
+                    return 0;
+                });
+                
+                visibleRows.forEach(row => tbody.appendChild(row));
+            }
+            
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+            
+            if (!hasResults) {
+                const tbody = document.getElementById('customersTableBody');
+                const newRow = document.createElement('tr');
+                newRow.id = 'noResultRow';
+                newRow.innerHTML = '<td colspan="8" class="empty-row"><i class="fas fa-filter"></i>Không có khách hàng nào phù hợp với bộ lọc</td>';
+                tbody.appendChild(newRow);
+            }
+        }
+        
+        function resetFilters() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('spentFilter').value = '';
+            document.getElementById('sortFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            const rows = document.querySelectorAll('#customersTableBody tr');
+            rows.forEach(row => {
+                if (!row.querySelector('.empty-row')) row.style.display = '';
+            });
+            const noResultRow = document.getElementById('noResultRow');
+            if (noResultRow) noResultRow.remove();
+        }
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchCustomers();
+        });
+    </script>
+</body>
+</html>

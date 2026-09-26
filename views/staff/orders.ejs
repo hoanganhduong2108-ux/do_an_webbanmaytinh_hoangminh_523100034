@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %> - PC MDZ Staff</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar { width: 280px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; padding: 25px 0; }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: #ccc; text-decoration: none; transition: all 0.3s; }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .page-header h1 { font-size: 24px; color: #1a1a2e; }
+        .search-box { display: flex; gap: 10px; background: white; padding: 5px 15px; border-radius: 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-box input { border: none; padding: 10px; width: 250px; outline: none; }
+        .search-box button { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 16px; }
+        .filter-bar { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-bar select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-secondary { background: #6c757d; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 12px; }
+        .btn-primary { background: #007bff; color: white; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 12px; }
+        .orders-table { width: 100%; background: white; border-radius: 10px; overflow: hidden; }
+        .orders-table th, .orders-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .orders-table th { background: #f8f9fa; font-weight: 600; font-size: 13px; }
+        .status-badge { padding: 5px 10px; border-radius: 5px; font-size: 12px; }
+        .status-pending { background: #ffc107; color: #333; }
+        .status-confirmed { background: #17a2b8; color: white; }
+        .status-preparing { background: #fd7e14; color: white; }
+        .status-shipping { background: #6f42c1; color: white; }
+        .status-delivered { background: #28a745; color: white; }
+        .status-cancelled { background: #dc3545; color: white; }
+        .price-cell { color: #e74c3c; font-weight: 500; }
+        .empty-row { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <%- include('../partials/staff-sidebar', { currentPage: 'orders' }) %>
+        
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-shopping-cart"></i> Quản lý đơn hàng</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm đơn hàng...">
+                    <button onclick="searchOrders()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <div class="filter-bar">
+                <label>Lọc theo trạng thái: </label>
+                <select id="statusFilter" onchange="filterByStatus()">
+                    <option value="all" <%= currentStatus === 'all' ? 'selected' : '' %>>Tất cả</option>
+                    <option value="Chờ xác nhận" <%= currentStatus === 'Chờ xác nhận' ? 'selected' : '' %>>Chờ xác nhận</option>
+                    <option value="Đã xác nhận" <%= currentStatus === 'Đã xác nhận' ? 'selected' : '' %>>Đã xác nhận</option>
+                    <option value="Đang chuẩn bị" <%= currentStatus === 'Đang chuẩn bị' ? 'selected' : '' %>>Đang chuẩn bị</option>
+                    <option value="Đang giao hàng" <%= currentStatus === 'Đang giao hàng' ? 'selected' : '' %>>Đang giao hàng</option>
+                    <option value="Đã giao hàng" <%= currentStatus === 'Đã giao hàng' ? 'selected' : '' %>>Đã giao hàng</option>
+                    <option value="Đã hủy" <%= currentStatus === 'Đã hủy' ? 'selected' : '' %>>Đã hủy</option>
+                </select>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="orders-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>SĐT</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>NV xử lý</th>
+                            <th>Ngày đặt</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(o => { 
+                                var statusClass = '';
+                                if (o.orderStatus === 'Chờ xác nhận') statusClass = 'status-pending';
+                                else if (o.orderStatus === 'Đã xác nhận') statusClass = 'status-confirmed';
+                                else if (o.orderStatus === 'Đang chuẩn bị') statusClass = 'status-preparing';
+                                else if (o.orderStatus === 'Đang giao hàng') statusClass = 'status-shipping';
+                                else if (o.orderStatus === 'Đã giao hàng') statusClass = 'status-delivered';
+                                else statusClass = 'status-cancelled';
+                            %>
+                            <tr>
+                                <td><strong><%= o.orderCode %></strong>
+                                    <% if (o.orderSource === 'in-store') { %>
+                                        <br><small style="color:#e74c3c;"><i class="fas fa-store"></i> Tại shop</small>
+                                    <% } %>
+                                </td>
+                                <td><%= o.fullName %></td>
+                                <td><%= o.phone %></td>
+                                <td class="price-cell"><%= o.total.toLocaleString('vi-VN') %>đ</td>
+                                <td><span class="status-badge <%= statusClass %>"><%= o.orderStatus %></span></td>
+                                <td><%= o.processedBy ? o.processedBy.fullName : 'Chưa xử lý' %></td>
+                                <td><%= new Date(o.createdAt).toLocaleDateString('vi-VN') %></td>
+                                <td>
+                                    <a href="/staff/orders/<%= o._id %>" class="btn-secondary">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="8" class="empty-row">Không có đơn hàng nào</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function searchOrders() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#ordersTableBody tr');
+            let hasResults = false;
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchText)) { row.style.display = ''; hasResults = true; }
+                else { row.style.display = 'none'; }
+            });
+            if (!hasResults && searchText !== '') {
+                const tbody = document.getElementById('ordersTableBody');
+                if (document.getElementById('noResultRow')) return;
+                const noResultRow = document.createElement('tr');
+                noResultRow.id = 'noResultRow';
+                noResultRow.innerHTML = '<td colspan="8" class="empty-row">Không tìm thấy đơn hàng nào</td>';
+                tbody.appendChild(noResultRow);
+            } else {
+                const noResultRow = document.getElementById('noResultRow');
+                if (noResultRow) noResultRow.remove();
+            }
+        }
+        
+        function filterByStatus() {
+            const status = document.getElementById('statusFilter').value;
+            if (status === 'all') {
+                window.location.href = '/staff/orders';
+            } else {
+                window.location.href = '/staff/orders?status=' + encodeURIComponent(status);
+            }
+        }
+        
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchOrders();
+        });
+    </script>
+</body>
+</html>

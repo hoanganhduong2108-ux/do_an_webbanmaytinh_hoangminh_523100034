@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - PC Market</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo">
+                    <a href="/"><span class="logo-pc">PC</span><span class="logo-m">MDZ</span></a>
+                </div>
+                <div class="search-bar">
+                    <form action="/search" method="GET">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name">
+                                <i class="fas fa-user-circle"></i> <%= user.fullName %>
+                                <% if (user.role === 'staff') { %>
+                                    <span style="background:#e74c3c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">STAFF</span>
+                                <% } %>
+                                <% if (user.role === 'admin') { %>
+                                    <span style="background:#007bff;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị hệ thống</a>
+                                <% } %>
+                                <% if (user.role === 'staff') { %>
+                                    <a href="/staff/dashboard" style="background:#fff5f5;color:#e74c3c !important;font-weight:600;">
+                                        <i class="fas fa-user-tie"></i> Trang nhân viên
+                                    </a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login"><i class="fas fa-sign-in-alt"></i> Đăng nhập</a>
+                        <a href="/register"><i class="fas fa-user-plus"></i> Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU - ĐÃ SỬA (BỎ ICON, BỎ LAPTOP, BỎ ADMIN) -->
+       <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming"><i class="fas fa-gamepad"></i> PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation"><i class="fas fa-microchip"></i> PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-van-phong"><i class="fas fa-briefcase"></i> PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=laptop"><i class="fas fa-laptop"></i> LAPTOP</a></li>
+                    <li><a href="/products?category=man-hinh-may-tinh"><i class="fas fa-desktop"></i> MÀN HÌNH MÁY TÍNH</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh"><i class="fas fa-microchip"></i> LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">    
+                    <i class="fas fa-phone-alt"></i> Hotline: 099.999.9999
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title"><i class="fas fa-shopping-cart"></i> GIỎ HÀNG CỦA BẠN</h1>
+            
+            <% if (locals.cart && cart.length > 0) { %>
+                <div class="cart-container">
+                    <div class="cart-items">
+                        <table class="cart-table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(var i = 0; i < cart.length; i++) { 
+                                    var item = cart[i];
+                                %>
+                                    <tr id="cart-item-<%= item.productId %>">
+                                        <td><%= item.name %></div></td>
+                                        <td><%= item.price.toLocaleString('vi-VN') %>đ</div></td>
+                                        <td>
+                                            <div class="cart-quantity">
+                                                <button class="qty-btn" onclick="updateCartQuantity('<%= item.productId %>','<%= item.quantity - 1 %>')">-</button>
+                                                <input type="number" id="qty-<%= item.productId %>" value="<%= item.quantity %>" min="1" 
+                                                       onchange="updateCartQuantity('<%= item.productId %>', this.value)">
+                                                <button class="qty-btn" onclick="updateCartQuantity('<%= item.productId %>', '<%= item.quantity + 1 %>')">+</button>
+                                            </div>
+                                         </div>
+                                        <td><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</div></td>
+                                        <td>
+                                            <button class="remove-btn" onclick="removeFromCart('<%= item.productId %>')">
+                                                <i class="fas fa-trash-alt"></i> Xóa
+                                            </button>
+                                         </div>
+                                     </div>
+                                <% } %>
+                            </tbody>
+                         </table>
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <h3>Tổng quan đơn hàng</h3>
+                        <div class="summary-row">
+                            <span>Tạm tính:</span>
+                            <span><%= total.toLocaleString('vi-VN') %>đ</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Phí vận chuyển:</span>
+                            <span>30.000đ</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Tổng cộng:</span>
+                            <span><%= (total + 30000).toLocaleString('vi-VN') %>đ</span>
+                        </div>
+                        <a href="/checkout" class="btn btn-primary btn-block">
+                            <i class="fas fa-credit-card"></i> Tiến hành thanh toán
+                        </a>
+                        <a href="/products" class="btn btn-secondary btn-block">
+                            <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart fa-4x"></i>
+                    <h2>Giỏ hàng của bạn đang trống</h2>
+                    <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+                    <a href="/products" class="btn btn-primary">Mua sắm ngay</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+ <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>1A, Gốc Đề, Q.Hai Bà Trưng, Hà Nội</p>
+                    <p>Tel: 034.567.8912</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>1A Cửu Long, P.15, Q.10, TP.HCM</p>
+                    <p>Tel: 099.999.9999</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Tin tức</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function updateCartQuantity(productId, newQuantity) {
+            if (newQuantity < 1) {
+                removeFromCart(productId);
+                return;
+            }
+            
+            fetch('/cart/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    productId: productId, 
+                    quantity: newQuantity 
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Cập nhật số lượng thất bại');
+                }
+            })
+            .catch(function(error) {
+                console.error('Lỗi:', error);
+                alert('Cập nhật số lượng thất bại');
+            });
+        }
+        
+        function removeFromCart(productId) {
+            if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+                fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId: productId })
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        var cartCountSpan = document.getElementById('cart-count');
+                        if (cartCountSpan) {
+                            cartCountSpan.innerText = data.cartCount || 0;
+                        }
+                        var row = document.getElementById('cart-item-' + productId);
+                        if (row) {
+                            row.remove();
+                        }
+                        var remainingRows = document.querySelectorAll('tbody tr').length;
+                        if (remainingRows === 0) {
+                            window.location.reload();
+                        } else {
+                            location.reload();
+                        }
+                    } else {
+                        alert(data.message || 'Xóa sản phẩm thất bại');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Lỗi:', error);
+                    alert('Xóa sản phẩm thất bại, vui lòng thử lại');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

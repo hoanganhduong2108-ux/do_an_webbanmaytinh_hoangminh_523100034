@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .page-header h1 { font-size: 24px; color: #1a1a2e; }
+        .search-box { display: flex; gap: 10px; background: white; padding: 5px 15px; border-radius: 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .search-box input { border: none; padding: 10px; width: 250px; outline: none; }
+        .search-box button { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 16px; }
+        .btn-primary { background: #e74c3c; color: white; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; }
+        .btn-secondary { background: #6c757d; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
+        .btn-danger { background: #dc3545; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
+        .category-table { width: 100%; background: white; border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .category-table th, .category-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .category-table th { background: #f8f9fa; font-weight: 600; }
+        .form-inline { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
+        .form-group input, .form-group select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; width: 100%; }
+        .empty-row { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="page-header">
+                <h1><i class="fas fa-folder"></i> Quản lý danh mục</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm danh mục...">
+                    <button onclick="searchCategories()"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- Form thêm danh mục -->
+            <div style="background: white; padding: 20px; border-radius: 10px;">
+                <h3>Thêm danh mục mới</h3>
+                <form method="POST" action="/admin/categories" class="form-inline" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Tên danh mục</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group" style="flex: 3;">
+                        <label>Mô tả</label>
+                        <input type="text" name="description">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Thứ tự</label>
+                        <input type="number" name="order" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn-primary">+ Thêm</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Danh sách danh mục -->
+            <table class="category-table" id="categoriesTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên danh mục</th>
+                        <th>Slug</th>
+                        <th>Mô tả</th>
+                        <th>Thứ tự</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="categoriesTableBody">
+                    <% for(var i = 0; i < categories.length; i++) { %>
+                    <tr>
+                        <td><%= i + 1 %></div></td>
+                        <td>
+                            <form method="POST" action="/admin/categories/<%= categories[i]._id %>?_method=PUT" style="display: flex; gap: 5px;">
+                                <input type="text" name="name" value="<%= categories[i].name %>" style="padding: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                                <button type="submit" class="btn-secondary"><i class="fas fa-save"></i></button>
+                            </form>
+                         </div>
+                        <td><%= categories[i].slug %> </div></td>
+                        <td>
+                            <form method="POST" action="/admin/categories/<%= categories[i]._id %>?_method=PUT" style="display: flex; gap: 5px;">
+                                <input type="text" name="description" value="<%= categories[i].description || '' %>" style="padding: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                                <input type="hidden" name="name" value="<%= categories[i].name %>">
+                                <input type="hidden" name="order" value="<%= categories[i].order %>">
+                                <button type="submit" class="btn-secondary"><i class="fas fa-save"></i></button>
+                            </form>
+                         </div>
+                        <td>
+                            <form method="POST" action="/admin/categories/<%= categories[i]._id %>?_method=PUT" style="display: flex; gap: 5px; width: 100px;">
+                                <input type="number" name="order" value="<%= categories[i].order %>" style="padding: 5px; width: 60px;">
+                                <input type="hidden" name="name" value="<%= categories[i].name %>">
+                                <input type="hidden" name="description" value="<%= categories[i].description %>">
+                                <button type="submit" class="btn-secondary"><i class="fas fa-save"></i></button>
+                            </form>
+                         </div>
+                        <td>
+                            <form method="POST" action="/admin/categories/<%= categories[i]._id %>?_method=DELETE" onsubmit="return confirm('Xóa danh mục này?')" style="display:inline;">
+                                <button type="submit" class="btn-danger"><i class="fas fa-trash"></i> Xóa</button>
+                            </form>
+                         </div>
+                     </div>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function searchCategories() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#categoriesTableBody tr');
+            let hasResults = false;
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(searchText)) { row.style.display = ''; hasResults = true; }
+                else { row.style.display = 'none'; }
+            });
+            if (!hasResults && searchText !== '') {
+                const tbody = document.getElementById('categoriesTableBody');
+                if (document.getElementById('noResultRow')) return;
+                const noResultRow = document.createElement('tr');
+                noResultRow.id = 'noResultRow';
+                noResultRow.innerHTML = '<td colspan="6" class="empty-row">Không tìm thấy danh mục nào</td>';
+                tbody.appendChild(noResultRow);
+            } else {
+                const noResultRow = document.getElementById('noResultRow');
+                if (noResultRow) noResultRow.remove();
+            }
+        }
+        document.getElementById('searchInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') searchCategories(); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách sản phẩm - PC Market</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fa;
+            color: #1a1a2e;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        .header-top {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo a {
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: 800;
+        }
+        
+        .logo-pc {
+            color: #e74c3c;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .logo-m {
+            color: #e74c3c;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 450px;
+            margin: 0 20px;
+        }
+        
+        .search-bar form {
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            outline: none;
+        }
+        
+        .search-bar button {
+            padding: 12px 25px;
+            background: #e74c3c;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown span {
+            cursor: pointer;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 30px;
+        }
+        
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .dropdown a {
+            display: block;
+            padding: 12px 20px;
+            color: #333 !important;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .dropdown a:hover {
+            background: #f5f5f5;
+            color: #e74c3c !important;
+        }
+        
+        .user-dropdown:hover .dropdown {
+            display: block;
+        }
+        
+        .cart-icon {
+            position: relative;
+        }
+        
+        #cart-count {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+        
+        /* Navigation - Menu to hơn, đẹp hơn, vẫn 1 hàng */
+        .navigation-bar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 0;
+        }
+        
+        .navigation-bar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navigation-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-wrap: nowrap;
+            gap: 0;
+        }
+        
+        .navigation-menu li {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navigation-menu li a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            padding: 14px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-radius: 0;
+        }
+        
+        .navigation-menu li a i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        
+        .navigation-menu li a:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .hotline-number {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+        
+        .hotline-number i {
+            margin-right: 6px;
+        }
+        
+        /* Products Layout */
+        .products-layout {
+            display: flex;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        /* Filter Sidebar */
+        .filter-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            position: sticky;
+            top: 100px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        
+        .filter-card h3 {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e74c3c;
+            font-size: 18px;
+        }
+        
+        .filter-group {
+            margin-bottom: 25px;
+        }
+        
+        .filter-group h4 {
+            margin-bottom: 12px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .price-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .price-input-group {
+            flex: 1;
+        }
+        
+        .price-input {
+            width: 100%;
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .price-input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        
+        .price-separator {
+            color: #999;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .filter-actions {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Products Main */
+        .products-main {
+            flex: 1;
+        }
+        
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .product-count {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sort-options select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 25px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            position: relative;
+            height: 220px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        
+        .no-image {
+            text-align: center;
+            color: #ccc;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .sold-badge {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+        
+        .product-info {
+            padding: 20px;
+        }
+        
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            height: 48px;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        .product-name a {
+            color: #1a1a2e;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .product-name a:hover {
+            color: #e74c3c;
+        }
+        
+        .product-categories {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .product-categories i {
+            margin-right: 5px;
+        }
+        
+        .product-price {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .current-price {
+            color: #e74c3c;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .old-price {
+            color: #999;
+            text-decoration: line-through;
+            font-size: 14px;
+        }
+        
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231,76,60,0.3);
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 16px;
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ccc;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-column h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .footer-column p, .footer-column a {
+            color: #aaa;
+            text-decoration: none;
+            line-height: 1.8;
+            display: block;
+            font-size: 13px;
+        }
+        
+        .footer-column a:hover {
+            color: #e74c3c;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .navigation-menu li a {
+                padding: 12px 12px;
+                font-size: 13px;
+            }
+            .navigation-menu li a i {
+                margin-right: 6px;
+                font-size: 13px;
+            }
+            .hotline-number {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .products-layout {
+                flex-direction: column;
+            }
+            .filter-sidebar {
+                width: 100%;
+            }
+            .navigation-bar .container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .navigation-menu {
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+            }
+            .hotline-number {
+                text-align: center;
+                margin-left: 0;
+                align-self: center;
+                width: fit-content;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 15px;
+            }
+            .products-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .price-range {
+                flex-direction: column;
+            }
+            .price-separator {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo">
+                    <a href="/"><span class="logo-pc">PC</span><span class="logo-m">MDZ</span></a>
+                </div>
+                <div class="search-bar">
+                    <form action="/search" method="GET">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+               <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name">
+                                <i class="fas fa-user-circle"></i> <%= user.fullName %>
+                                <% if (user.role === 'staff') { %>
+                                    <span style="background:#e74c3c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">STAFF</span>
+                                <% } %>
+                                <% if (user.role === 'admin') { %>
+                                    <span style="background:#007bff;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị hệ thống</a>
+                                <% } %>
+                                <% if (user.role === 'staff') { %>
+                                    <a href="/staff/dashboard" style="background:#fff5f5;color:#e74c3c !important;font-weight:600;">
+                                        <i class="fas fa-user-tie"></i> Trang nhân viên
+                                    </a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login">Đăng nhập</a>
+                        <a href="/register">Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i><span id="cart-count">0</span></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU - TO HƠN, ĐẸP HƠN, VẪN 1 HÀNG -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming"><i class="fas fa-gamepad"></i> PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation"><i class="fas fa-microchip"></i> PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-van-phong"><i class="fas fa-briefcase"></i> PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=laptop"><i class="fas fa-laptop"></i> LAPTOP</a></li>
+                    <li><a href="/products?category=man-hinh-may-tinh"><i class="fas fa-desktop"></i> MÀN HÌNH MÁY TÍNH</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh"><i class="fas fa-microchip"></i> LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">
+                    <i class="fas fa-phone-alt"></i> Hotline: 099.999.9999
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <div class="products-layout">
+<!-- FILTER SIDEBAR -->
+<aside class="filter-sidebar">
+    <div class="filter-card">
+        <h3><i class="fas fa-filter"></i> LỌC SẢN PHẨM</h3>
+        <form id="filterForm" method="GET" action="/products">
+            <!-- Giữ category ẩn nếu đang lọc -->
+            <% if (query && query.category) { %>
+                <input type="hidden" name="category" value="<%= query.category %>">
+            <% } %>
+            
+            <!-- ===== RIÊNG MÀN HÌNH ===== -->
+            <% if (locals.isManHinh) { %>
+                
+                <!-- Hãng sản xuất -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tags"></i> Hãng sản xuất</h4>
+                    <select name="brand" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả hãng</option>
+                        <option value="ASUS" <%= query && query.brand === 'ASUS' ? 'selected' : '' %>>ASUS</option>
+                        <option value="AOC" <%= query && query.brand === 'AOC' ? 'selected' : '' %>>AOC</option>
+                        <option value="Dell" <%= query && query.brand === 'Dell' ? 'selected' : '' %>>Dell</option>
+                        <option value="HP" <%= query && query.brand === 'HP' ? 'selected' : '' %>>HP</option>
+                        <option value="LG" <%= query && query.brand === 'LG' ? 'selected' : '' %>>LG</option>
+                        <option value="Samsung" <%= query && query.brand === 'Samsung' ? 'selected' : '' %>>Samsung</option>
+                        <option value="MSI" <%= query && query.brand === 'MSI' ? 'selected' : '' %>>MSI</option>
+                        <option value="Gigabyte" <%= query && query.brand === 'Gigabyte' ? 'selected' : '' %>>Gigabyte</option>
+                        <option value="ViewSonic" <%= query && query.brand === 'ViewSonic' ? 'selected' : '' %>>ViewSonic</option>
+                        <option value="BenQ" <%= query && query.brand === 'BenQ' ? 'selected' : '' %>>BenQ</option>
+                        <option value="Philips" <%= query && query.brand === 'Philips' ? 'selected' : '' %>>Philips</option>
+                        <option value="Xiaomi" <%= query && query.brand === 'Xiaomi' ? 'selected' : '' %>>Xiaomi</option>
+                        <option value="E-Dra" <%= query && query.brand === 'E-Dra' ? 'selected' : '' %>>E-Dra</option>
+                        <option value="HKC" <%= query && query.brand === 'HKC' ? 'selected' : '' %>>HKC</option>
+                        <option value="Cooler Master" <%= query && query.brand === 'Cooler Master' ? 'selected' : '' %>>Cooler Master</option>
+                    </select>
+                </div>
+                
+                <!-- Khoảng giá -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-dollar-sign"></i> Khoảng giá</h4>
+                    <div class="price-range">
+                        <div class="price-input-group">
+                            <input type="number" name="minPrice" placeholder="Từ" value="<%= query && query.minPrice ? query.minPrice : '' %>" class="price-input">
+                        </div>
+                        <span class="price-separator">-</span>
+                        <div class="price-input-group">
+                            <input type="number" name="maxPrice" placeholder="Đến" value="<%= query && query.maxPrice ? query.maxPrice : '' %>" class="price-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kích thước màn hình -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-expand"></i> Kích thước</h4>
+                    <select name="screenSize" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả kích thước</option>
+                        <option value="21.5" <%= query && query.screenSize === '21.5' ? 'selected' : '' %>>21.5 inch</option>
+                        <option value="24" <%= query && query.screenSize === '24' ? 'selected' : '' %>>24 inch</option>
+                        <option value="27" <%= query && query.screenSize === '27' ? 'selected' : '' %>>27 inch</option>
+                        <option value="32" <%= query && query.screenSize === '32' ? 'selected' : '' %>>32 inch</option>
+                        <option value="34" <%= query && query.screenSize === '34' ? 'selected' : '' %>>34 inch (Ultrawide)</option>
+                        <option value="49" <%= query && query.screenSize === '49' ? 'selected' : '' %>>49 inch (Super Ultrawide)</option>
+                    </select>
+                </div>
+                
+                <!-- Độ phân giải -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tv"></i> Độ phân giải</h4>
+                    <select name="resolution" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả độ phân giải</option>
+                        <option value="1920x1080" <%= query && query.resolution === '1920x1080' ? 'selected' : '' %>>Full HD (1920x1080)</option>
+                        <option value="2560x1440" <%= query && query.resolution === '2560x1440' ? 'selected' : '' %>>2K QHD (2560x1440)</option>
+                        <option value="3840x2160" <%= query && query.resolution === '3840x2160' ? 'selected' : '' %>>4K UHD (3840x2160)</option>
+                        <option value="3440x1440" <%= query && query.resolution === '3440x1440' ? 'selected' : '' %>>Ultrawide (3440x1440)</option>
+                        <option value="2560x1080" <%= query && query.resolution === '2560x1080' ? 'selected' : '' %>>Ultrawide FHD (2560x1080)</option>
+                        <option value="5120x1440" <%= query && query.resolution === '5120x1440' ? 'selected' : '' %>>Super Ultrawide (5120x1440)</option>
+                    </select>
+                </div>
+                
+                <!-- Tần số quét -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tachometer-alt"></i> Tần số quét</h4>
+                    <select name="refreshRate" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả tần số</option>
+                        <option value="60" <%= query && query.refreshRate === '60' ? 'selected' : '' %>>60Hz</option>
+                        <option value="75" <%= query && query.refreshRate === '75' ? 'selected' : '' %>>75Hz</option>
+                        <option value="100" <%= query && query.refreshRate === '100' ? 'selected' : '' %>>100Hz</option>
+                        <option value="120" <%= query && query.refreshRate === '120' ? 'selected' : '' %>>120Hz</option>
+                        <option value="144" <%= query && query.refreshRate === '144' ? 'selected' : '' %>>144Hz</option>
+                        <option value="165" <%= query && query.refreshRate === '165' ? 'selected' : '' %>>165Hz</option>
+                        <option value="180" <%= query && query.refreshRate === '180' ? 'selected' : '' %>>180Hz</option>
+                        <option value="200" <%= query && query.refreshRate === '200' ? 'selected' : '' %>>200Hz</option>
+                        <option value="240" <%= query && query.refreshRate === '240' ? 'selected' : '' %>>240Hz</option>
+                        <option value="360" <%= query && query.refreshRate === '360' ? 'selected' : '' %>>360Hz</option>
+                    </select>
+                </div>
+                
+                <!-- Tấm nền -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-layer-group"></i> Tấm nền</h4>
+                    <select name="panelType" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả tấm nền</option>
+                        <option value="IPS" <%= query && query.panelType === 'IPS' ? 'selected' : '' %>>IPS</option>
+                        <option value="Fast IPS" <%= query && query.panelType === 'Fast IPS' ? 'selected' : '' %>>Fast IPS</option>
+                        <option value="Nano IPS" <%= query && query.panelType === 'Nano IPS' ? 'selected' : '' %>>Nano IPS</option>
+                        <option value="VA" <%= query && query.panelType === 'VA' ? 'selected' : '' %>>VA</option>
+                        <option value="TN" <%= query && query.panelType === 'TN' ? 'selected' : '' %>>TN</option>
+                        <option value="OLED" <%= query && query.panelType === 'OLED' ? 'selected' : '' %>>OLED</option>
+                    </select>
+                </div>
+                
+            <% } else if (locals.isLinhKien) { %>
+                <!-- ===== RIÊNG LINH KIỆN ===== -->
+                
+                <!-- Khoảng giá -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-dollar-sign"></i> Khoảng giá</h4>
+                    <div class="price-range">
+                        <div class="price-input-group">
+                            <input type="number" name="minPrice" placeholder="Từ" value="<%= query && query.minPrice ? query.minPrice : '' %>" class="price-input">
+                        </div>
+                        <span class="price-separator">-</span>
+                        <div class="price-input-group">
+                            <input type="number" name="maxPrice" placeholder="Đến" value="<%= query && query.maxPrice ? query.maxPrice : '' %>" class="price-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mainboard -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-server"></i> Mainboard</h4>
+                    <select name="mainboard" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="B760" <%= query && query.mainboard === 'B760' ? 'selected' : '' %>>B760</option>
+                        <option value="B650" <%= query && query.mainboard === 'B650' ? 'selected' : '' %>>B650</option>
+                        <option value="X670" <%= query && query.mainboard === 'X670' ? 'selected' : '' %>>X670</option>
+                        <option value="Z790" <%= query && query.mainboard === 'Z790' ? 'selected' : '' %>>Z790</option>
+                        <option value="H610" <%= query && query.mainboard === 'H610' ? 'selected' : '' %>>H610</option>
+                    </select>
+                </div>
+                
+                <!-- Case -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-box"></i> Case (Vỏ máy)</h4>
+                    <select name="case" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="ATX" <%= query && query.case === 'ATX' ? 'selected' : '' %>>ATX</option>
+                        <option value="Micro ATX" <%= query && query.case === 'Micro ATX' ? 'selected' : '' %>>Micro ATX</option>
+                        <option value="Mini ITX" <%= query && query.case === 'Mini ITX' ? 'selected' : '' %>>Mini ITX</option>
+                        <option value="Full Tower" <%= query && query.case === 'Full Tower' ? 'selected' : '' %>>Full Tower</option>
+                    </select>
+                </div>
+                
+                <!-- PSU -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-plug"></i> PSU (Nguồn)</h4>
+                    <select name="psu" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="450W" <%= query && query.psu === '450W' ? 'selected' : '' %>>450W</option>
+                        <option value="550W" <%= query && query.psu === '550W' ? 'selected' : '' %>>550W</option>
+                        <option value="650W" <%= query && query.psu === '650W' ? 'selected' : '' %>>650W</option>
+                        <option value="750W" <%= query && query.psu === '750W' ? 'selected' : '' %>>750W</option>
+                        <option value="850W" <%= query && query.psu === '850W' ? 'selected' : '' %>>850W</option>
+                        <option value="1000W" <%= query && query.psu === '1000W' ? 'selected' : '' %>>1000W</option>
+                    </select>
+                </div>
+                
+                <!-- HDD -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-database"></i> HDD</h4>
+                    <select name="hdd" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="1TB" <%= query && query.hdd === '1TB' ? 'selected' : '' %>>1TB</option>
+                        <option value="2TB" <%= query && query.hdd === '2TB' ? 'selected' : '' %>>2TB</option>
+                        <option value="4TB" <%= query && query.hdd === '4TB' ? 'selected' : '' %>>4TB</option>
+                        <option value="7200rpm" <%= query && query.hdd === '7200rpm' ? 'selected' : '' %>>7200rpm</option>
+                    </select>
+                </div>
+                
+                <!-- Tản nhiệt -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-fan"></i> Tản nhiệt</h4>
+                    <select name="cooler" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="Tản khí" <%= query && query.cooler === 'Tản khí' ? 'selected' : '' %>>Tản khí</option>
+                        <option value="Tản nước AIO 240" <%= query && query.cooler === 'Tản nước AIO 240' ? 'selected' : '' %>>Tản nước AIO 240mm</option>
+                        <option value="Tản nước AIO 360" <%= query && query.cooler === 'Tản nước AIO 360' ? 'selected' : '' %>>Tản nước AIO 360mm</option>
+                    </select>
+                </div>
+                
+                <!-- Hãng -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tags"></i> Hãng sản xuất</h4>
+                    <select name="brand" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả hãng</option>
+                        <option value="ASUS" <%= query && query.brand === 'ASUS' ? 'selected' : '' %>>ASUS</option>
+                        <option value="MSI" <%= query && query.brand === 'MSI' ? 'selected' : '' %>>MSI</option>
+                        <option value="Gigabyte" <%= query && query.brand === 'Gigabyte' ? 'selected' : '' %>>Gigabyte</option>
+                        <option value="ASRock" <%= query && query.brand === 'ASRock' ? 'selected' : '' %>>ASRock</option>
+                        <option value="Intel" <%= query && query.brand === 'Intel' ? 'selected' : '' %>>Intel</option>
+                        <option value="AMD" <%= query && query.brand === 'AMD' ? 'selected' : '' %>>AMD</option>
+                        <option value="Corsair" <%= query && query.brand === 'Corsair' ? 'selected' : '' %>>Corsair</option>
+                        <option value="NZXT" <%= query && query.brand === 'NZXT' ? 'selected' : '' %>>NZXT</option>
+                        <option value="Cooler Master" <%= query && query.brand === 'Cooler Master' ? 'selected' : '' %>>Cooler Master</option>
+                        <option value="Samsung" <%= query && query.brand === 'Samsung' ? 'selected' : '' %>>Samsung</option>
+                        <option value="Western Digital" <%= query && query.brand === 'Western Digital' ? 'selected' : '' %>>Western Digital</option>
+                        <option value="Seagate" <%= query && query.brand === 'Seagate' ? 'selected' : '' %>>Seagate</option>
+                    </select>
+                </div>
+                
+            <% } else { %>
+                <!-- ===== MẶC ĐỊNH (PC, LAPTOP, ...) ===== -->
+                
+                <!-- Khoảng giá -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-dollar-sign"></i> Khoảng giá</h4>
+                    <div class="price-range">
+                        <div class="price-input-group">
+                            <input type="number" name="minPrice" placeholder="Từ" value="<%= query && query.minPrice ? query.minPrice : '' %>" class="price-input">
+                        </div>
+                        <span class="price-separator">-</span>
+                        <div class="price-input-group">
+                            <input type="number" name="maxPrice" placeholder="Đến" value="<%= query && query.maxPrice ? query.maxPrice : '' %>" class="price-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CPU -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-microchip"></i> CPU</h4>
+                    <select name="cpu" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="Intel Core Ultra" <%= query && query.cpu === 'Intel Core Ultra' ? 'selected' : '' %>>Intel Core Ultra</option>
+                        <option value="Intel Core i9" <%= query && query.cpu === 'Intel Core i9' ? 'selected' : '' %>>Intel Core i9</option>
+                        <option value="Intel Core i7" <%= query && query.cpu === 'Intel Core i7' ? 'selected' : '' %>>Intel Core i7</option>
+                        <option value="Intel Core i5" <%= query && query.cpu === 'Intel Core i5' ? 'selected' : '' %>>Intel Core i5</option>
+                        <option value="AMD Ryzen 9" <%= query && query.cpu === 'AMD Ryzen 9' ? 'selected' : '' %>>AMD Ryzen 9</option>
+                        <option value="AMD Ryzen 7" <%= query && query.cpu === 'AMD Ryzen 7' ? 'selected' : '' %>>AMD Ryzen 7</option>
+                        <option value="AMD Ryzen 5" <%= query && query.cpu === 'AMD Ryzen 5' ? 'selected' : '' %>>AMD Ryzen 5</option>
+                    </select>
+                </div>
+                
+                <!-- RAM -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-memory"></i> RAM</h4>
+                    <select name="ram" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="8GB" <%= query && query.ram === '8GB' ? 'selected' : '' %>>8GB</option>
+                        <option value="16GB" <%= query && query.ram === '16GB' ? 'selected' : '' %>>16GB</option>
+                        <option value="32GB" <%= query && query.ram === '32GB' ? 'selected' : '' %>>32GB</option>
+                        <option value="64GB" <%= query && query.ram === '64GB' ? 'selected' : '' %>>64GB</option>
+                        <option value="DDR4" <%= query && query.ram === 'DDR4' ? 'selected' : '' %>>DDR4</option>
+                        <option value="DDR5" <%= query && query.ram === 'DDR5' ? 'selected' : '' %>>DDR5</option>
+                    </select>
+                </div>
+                
+                <!-- SSD -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-hdd"></i> SSD / Ổ cứng</h4>
+                    <select name="storage" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="256GB" <%= query && query.storage === '256GB' ? 'selected' : '' %>>256GB</option>
+                        <option value="512GB" <%= query && query.storage === '512GB' ? 'selected' : '' %>>512GB</option>
+                        <option value="1TB" <%= query && query.storage === '1TB' ? 'selected' : '' %>>1TB</option>
+                        <option value="2TB" <%= query && query.storage === '2TB' ? 'selected' : '' %>>2TB</option>
+                        <option value="SSD" <%= query && query.storage === 'SSD' ? 'selected' : '' %>>SSD</option>
+                        <option value="NVMe" <%= query && query.storage === 'NVMe' ? 'selected' : '' %>>NVMe</option>
+                    </select>
+                </div>
+                
+                <!-- GPU -->
+                <div class="filter-group">
+                    <h4><i class="fas fa-tv"></i> Card đồ họa (GPU)</h4>
+                    <select name="graphics" onchange="this.form.submit()" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="RTX 5090" <%= query && query.graphics === 'RTX 5090' ? 'selected' : '' %>>RTX 5090</option>
+                        <option value="RTX 5080" <%= query && query.graphics === 'RTX 5080' ? 'selected' : '' %>>RTX 5080</option>
+                        <option value="RTX 5070" <%= query && query.graphics === 'RTX 5070' ? 'selected' : '' %>>RTX 5070</option>
+                        <option value="RTX 5060" <%= query && query.graphics === 'RTX 5060' ? 'selected' : '' %>>RTX 5060</option>
+                        <option value="RTX 4090" <%= query && query.graphics === 'RTX 4090' ? 'selected' : '' %>>RTX 4090</option>
+                        <option value="RTX 4080" <%= query && query.graphics === 'RTX 4080' ? 'selected' : '' %>>RTX 4080</option>
+                        <option value="RTX 4070" <%= query && query.graphics === 'RTX 4070' ? 'selected' : '' %>>RTX 4070</option>
+                        <option value="RTX 4060" <%= query && query.graphics === 'RTX 4060' ? 'selected' : '' %>>RTX 4060</option>
+                        <option value="AMD Radeon" <%= query && query.graphics === 'AMD Radeon' ? 'selected' : '' %>>AMD Radeon</option>
+                    </select>
+                </div>
+                
+            <% } %>
+            
+            <!-- ===== NÚT ===== -->
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-search"></i> Áp dụng bộ lọc
+                </button>
+                <button type="button" class="btn btn-secondary btn-block" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Xóa tất cả
+                </button>
+            </div>
+        </form>
+    </div>
+</aside>
+                
+                <!-- PRODUCTS MAIN -->
+                <div class="products-main">
+                    <div class="products-header">
+                        <h2>Tìm thấy <span class="product-count"><%= products ? products.length : 0 %></span> sản phẩm</h2>
+                        <div class="sort-options">
+                            <label><i class="fas fa-sort"></i> Sắp xếp theo:</label>
+                            <select id="sortSelect" onchange="applySorting()">
+                                <option value="newest" <%= query && (query.sort === 'newest' || !query.sort) ? 'selected' : '' %>>Mới nhất</option>
+                                <option value="price_asc" <%= query && query.sort === 'price_asc' ? 'selected' : '' %>>Giá tăng dần</option>
+                                <option value="price_desc" <%= query && query.sort === 'price_desc' ? 'selected' : '' %>>Giá giảm dần</option>
+                                <option value="sold" <%= query && query.sort === 'sold' ? 'selected' : '' %>>Bán chạy nhất</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <% if (products && products.length > 0) { %>
+                        <div class="products-grid">
+                            <% for(var i = 0; i < products.length; i++) { %>
+                                <div class="product-card">
+                                    <div class="product-image">
+                                        <a href="/product/<%= products[i].slug %>">
+                                            <% if (products[i].image) { %>
+                                                <img src="<%= products[i].image %>" alt="<%= products[i].name %>">
+                                            <% } else { %>
+                                                <div class="no-image"><i class="fas fa-desktop fa-3x"></i></div>
+                                            <% } %>
+                                        </a>
+                                        <% if (products[i].oldPrice) { %>
+                                            <span class="discount-badge">-<%= Math.round((1 - products[i].price / products[i].oldPrice) * 100) %>%</span>
+                                        <% } %>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-name"><a href="/product/<%= products[i].slug %>"><%= products[i].name %></a></h3>
+                                        <div class="product-categories">
+                                            <i class="fas fa-folder"></i>
+                                            <% if (products[i].categories && products[i].categories.length > 0) { %>
+                                                <%= products[i].categories.map(c => c.name).join(', ') %>
+                                            <% } else { %>
+                                                Chưa phân loại
+                                            <% } %>
+                                        </div>
+                                        <div class="product-price">
+                                            <span class="current-price"><%= products[i].price.toLocaleString('vi-VN') %>đ</span>
+                                            <% if (products[i].oldPrice) { %>
+                                                <span class="old-price"><%= products[i].oldPrice.toLocaleString('vi-VN') %>đ</span>
+                                            <% } %>
+                                        </div>
+                                        <div class="product-actions">
+                                            <% if (locals.isLoggedIn) { %>
+                                                <button class="add-to-cart-btn" onclick="addToCart('<%= products[i]._id %>')">
+                                                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+                                                </button>
+                                            <% } else { %>
+                                                <button class="add-to-cart-btn" onclick="alert('Vui lòng đăng nhập để mua hàng')">
+                                                    <i class="fas fa-shopping-cart"></i> Đăng nhập để mua
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <div class="no-products">
+                            <i class="fas fa-search fa-4x"></i>
+                            <h3>Không tìm thấy sản phẩm nào</h3>
+                            <p>Vui lòng thử lại với từ khóa khác hoặc xóa bộ lọc</p>
+                            <button class="btn btn-primary" onclick="clearFilters()">Xóa bộ lọc</button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>1A, Gốc Đề, Q.Hai Bà Trưng, Hà Nội</p>
+                    <p>Tel: 034.567.8912</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>1A Cửu Long, P.15, Q.10, TP.HCM</p>
+                    <p>Tel: 099.999.9999</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Tin tức</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function applySorting() {
+            const sortValue = document.getElementById('sortSelect').value;
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('sort', sortValue);
+            window.location.href = currentUrl.toString();
+        }
+        
+        function clearFilters() {
+    // Giữ lại category khi xóa bộ lọc
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    if (category) {
+        window.location.href = '/products?category=' + category;
+    } else {
+        window.location.href = '/products';
+    }
+}
+    </script> 
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %> - PC MDZ Staff</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar { width: 280px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; padding: 25px 0; }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: #ccc; text-decoration: none; transition: all 0.3s; }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #666; text-decoration: none; }
+        .back-link:hover { color: #e74c3c; }
+        .info-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .info-card h3 { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e74c3c; }
+        .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .info-label { width: 150px; font-weight: 600; color: #555; }
+        .info-value { flex: 1; color: #333; }
+        .items-table { width: 100%; border-collapse: collapse; }
+        .items-table th, .items-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .items-table th { background: #f8f9fa; font-weight: 600; }
+        .total-amount { color: #e74c3c; font-size: 20px; font-weight: bold; }
+        .timeline-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .timeline-date { width: 180px; font-weight: bold; font-size: 13px; }
+        .timeline-status { flex: 1; font-weight: 500; }
+        .timeline-note { flex: 2; color: #666; font-size: 13px; }
+        .status-update-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .status-update-form select { padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+        .status-update-form input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; min-width: 200px; }
+        .btn-primary { background: #e74c3c; color: white; padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; }
+        .btn-primary:hover { background: #c0392b; }
+        .staff-note-item {
+            background: #f8f9fa; padding: 12px; border-radius: 8px;
+            margin-bottom: 10px; border-left: 3px solid #e74c3c;
+        }
+        .staff-note-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; color: #666; }
+        .staff-note-content { color: #333; }
+        .note-form textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 8px; resize: vertical; min-height: 80px;
+        }
+        .note-form button { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <%- include('../partials/staff-sidebar', { currentPage: 'orders' }) %>
+        
+        <div class="admin-main">
+            <a href="/staff/orders" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+            
+            <h1 style="margin-bottom: 20px;">
+                <i class="fas fa-receipt"></i> Chi tiết đơn hàng
+                <span style="font-size:16px;color:#666;">#<%= order.orderCode %></span>
+                <% if (order.orderSource === 'in-store') { %>
+                    <span style="background:#e74c3c;color:white;padding:4px 10px;border-radius:20px;font-size:12px;">
+                        <i class="fas fa-store"></i> Tại shop
+                    </span>
+                <% } %>
+            </h1>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h3>
+                    <div class="info-row">
+                        <span class="info-label">Mã đơn:</span>
+                        <span class="info-value"><%= order.orderCode %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ngày đặt:</span>
+                        <span class="info-value"><%= new Date(order.createdAt).toLocaleString('vi-VN') %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Trạng thái:</span>
+                        <span class="info-value">
+                            <form method="POST" action="/staff/orders/<%= order._id %>/status?_method=PUT" class="status-update-form">
+                                <select name="status">
+                                    <option value="Chờ xác nhận" <%= order.orderStatus === 'Chờ xác nhận' ? 'selected' : '' %>>Chờ xác nhận</option>
+                                    <option value="Đã xác nhận" <%= order.orderStatus === 'Đã xác nhận' ? 'selected' : '' %>>Đã xác nhận</option>
+                                    <option value="Đang chuẩn bị" <%= order.orderStatus === 'Đang chuẩn bị' ? 'selected' : '' %>>Đang chuẩn bị</option>
+                                    <option value="Đang giao hàng" <%= order.orderStatus === 'Đang giao hàng' ? 'selected' : '' %>>Đang giao hàng</option>
+                                    <option value="Đã giao hàng" <%= order.orderStatus === 'Đã giao hàng' ? 'selected' : '' %>>Đã giao hàng</option>
+                                </select>
+                                <input type="text" name="note" placeholder="Ghi chú cập nhật...">
+                                <button type="submit" class="btn-primary">Cập nhật</button>
+                            </form>
+                            <small style="color:#e74c3c;display:block;margin-top:8px;">
+                                <i class="fas fa-exclamation-triangle"></i> Staff không có quyền hủy đơn
+                            </small>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">PT thanh toán:</span>
+                        <span class="info-value">
+                            <%= order.paymentMethod === 'cod' ? 'COD' : 
+                                order.paymentMethod === 'banking' ? 'Chuyển khoản' : 
+                                order.paymentMethod === 'momo' ? 'MoMo' : 'ZaloPay' %>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">TT thanh toán:</span>
+                        <span class="info-value"><%= order.paymentStatus %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">NV xử lý:</span>
+                        <span class="info-value"><%= order.processedBy ? order.processedBy.fullName : 'Chưa có' %></span>
+                    </div>
+                    <% if (order.createdBy) { %>
+                    <div class="info-row">
+                        <span class="info-label">NV tạo đơn:</span>
+                        <span class="info-value"><%= order.createdBy.fullName %></span>
+                    </div>
+                    <% } %>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                    <div class="info-row"><span class="info-label">Họ tên:</span><span class="info-value"><%= order.fullName %></span></div>
+                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value"><%= order.email %></span></div>
+                    <div class="info-row"><span class="info-label">SĐT:</span><span class="info-value"><%= order.phone %></span></div>
+                    <div class="info-row"><span class="info-label">Địa chỉ:</span><span class="info-value"><%= order.address %></span></div>
+                    <div class="info-row"><span class="info-label">Ghi chú KH:</span><span class="info-value"><%= order.note || 'Không có' %></span></div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-boxes"></i> Danh sách sản phẩm</h3>
+                <div style="overflow-x: auto;">
+                    <table class="items-table">
+                        <thead>
+                            <tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th></tr>
+                        </thead>
+                        <tbody>
+                            <% order.items.forEach(item => { %>
+                            <tr>
+                                <td><%= item.productName %></td>
+                                <td><%= item.price.toLocaleString('vi-VN') %>đ</td>
+                                <td><%= item.quantity %></td>
+                                <td><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="3"><strong>Tạm tính:</strong></td><td><%= order.subtotal.toLocaleString('vi-VN') %>đ</td></tr>
+                            <tr><td colspan="3"><strong>Phí vận chuyển:</strong></td><td><%= order.shippingFee.toLocaleString('vi-VN') %>đ</td></tr>
+                            <% if (order.discount > 0) { %>
+                            <tr><td colspan="3"><strong>Giảm giá:</strong></td><td style="color:#27ae60;">-<%= order.discount.toLocaleString('vi-VN') %>đ</td></tr>
+                            <% } %>
+                            <tr><td colspan="3"><strong>Tổng cộng:</strong></td><td class="total-amount"><%= order.total.toLocaleString('vi-VN') %>đ</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Ghi chú nội bộ -->
+            <div class="info-card">
+                <h3><i class="fas fa-sticky-note"></i> Ghi chú nội bộ (chỉ staff & admin thấy)</h3>
+                
+                <form method="POST" action="/staff/orders/<%= order._id %>/note" class="note-form" id="noteForm">
+                    <textarea name="content" placeholder="Nhập ghi chú tư vấn khách hàng..." required></textarea>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Lưu ghi chú</button>
+                </form>
+                
+                <div style="margin-top: 20px;">
+                    <% if (order.staffNotes && order.staffNotes.length > 0) { %>
+                        <% order.staffNotes.slice().reverse().forEach(note => { %>
+                        <div class="staff-note-item">
+                            <div class="staff-note-header">
+                                <strong><i class="fas fa-user-tie"></i> <%= note.staff ? note.staff.fullName : 'N/A' %></strong>
+                                <span><%= new Date(note.createdAt).toLocaleString('vi-VN') %></span>
+                            </div>
+                            <div class="staff-note-content"><%= note.content %></div>
+                        </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p style="color:#999;text-align:center;">Chưa có ghi chú nào</p>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Lịch sử trạng thái -->
+            <div class="info-card">
+                <h3><i class="fas fa-history"></i> Lịch sử cập nhật</h3>
+                <% order.statusHistory.forEach(h => { %>
+                <div class="timeline-item">
+                    <div class="timeline-date"><%= new Date(h.date).toLocaleString('vi-VN') %></div>
+                    <div class="timeline-status"><%= h.status %></div>
+                    <div class="timeline-note"><%= h.note %></div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('noteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: formData.get('content') })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Lỗi lưu ghi chú');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối');
+            }
+        });
+    </script>
+</body>
+</html>

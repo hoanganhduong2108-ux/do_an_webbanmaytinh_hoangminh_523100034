@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product ? 'Sửa' : 'Thêm' %> sản phẩm - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .form-container { max-width: 800px; margin: 0 auto; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #e74c3c; }
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group select[multiple] {
+            height: 120px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .required { color: #e74c3c; }
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .btn-save {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .btn-save:hover { background: #c0392b; }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-cancel:hover { background: #5a6268; }
+        .image-preview {
+            margin-top: 10px;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+       <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="form-container">
+                <a href="/admin/products" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                <div class="form-card">
+                    <h1><%= product ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới' %></h1>
+                    
+                    <form method="POST" action="/admin/products<%= product ? '/' + product._id + '?_method=PUT' : '' %>" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tên sản phẩm <span class="required">*</span></label>
+                                <input type="text" name="name" value="<%= product ? product.name : '' %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Danh mục <span class="required">*</span></label>
+                                <select name="categories" multiple required>
+                                    <% for(var i = 0; i < categories.length; i++) { %>
+                                        <option value="<%= categories[i]._id %>" 
+                                            <%= product && product.categories && product.categories.some(c => c._id && c._id.toString() === categories[i]._id.toString()) ? 'selected' : '' %>>
+                                            <%= categories[i].name %>
+                                        </option>
+                                    <% } %>
+                                </select>
+                                <div class="help-text">Giữ phím Ctrl (Windows) hoặc Command (Mac) để chọn nhiều danh mục</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Giá bán <span class="required">*</span></label>
+                                <input type="number" name="price" value="<%= product ? product.price : '' %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Giá cũ (khuyến mãi)</label>
+                                <input type="number" name="oldPrice" value="<%= product ? product.oldPrice : '' %>">
+                                <div class="help-text">Để trống nếu không có khuyến mãi</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Số lượng tồn kho <span class="required">*</span></label>
+                                <input type="number" name="stock" value="<%= product ? product.stock : '0' %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Hình ảnh</label>
+                                <input type="file" name="image" accept="image/*" onchange="previewImage(this)">
+                                <% if (product && product.image) { %>
+                                    <div class="image-preview">
+                                        <img src="<%= product.image %>" alt="<%= product.name %>">
+                                    </div>
+                                <% } %>
+                                <div id="imagePreview" class="image-preview" style="display:none;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CPU</label>
+                                <input type="text" name="cpu" value="<%= product ? product.cpu : '' %>" placeholder="VD: Intel Core i7 14700KF">
+                            </div>
+                            <div class="form-group">
+                                <label>RAM</label>
+                                <input type="text" name="ram" value="<%= product ? product.ram : '' %>" placeholder="VD: 32GB DDR5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Ổ cứng</label>
+                                <input type="text" name="storage" value="<%= product ? product.storage : '' %>" placeholder="VD: 1TB SSD NVMe">
+                            </div>
+                            <div class="form-group">
+                                <label>Card đồ họa</label>
+                                <input type="text" name="graphics" value="<%= product ? product.graphics : '' %>" placeholder="VD: RTX 5070 Ti">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+       <div class="form-group">
+        <label>Mainboard</label>
+        <input type="text" name="mainboard" value="<%= product ? product.mainboard : '' %>" placeholder="VD: ASUS ROG B760">
+    </div>
+    <div class="form-group">
+        <label>Case (Vỏ máy)</label>
+        <input type="text" name="case" value="<%= product ? product.case : '' %>" placeholder="VD: Case NZXT H5">
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group">
+        <label>PSU (Nguồn)</label>
+        <input type="text" name="psu" value="<%= product ? product.psu : '' %>" placeholder="VD: 750W 80 Plus Gold">
+    </div>
+    <div class="form-group">
+        <label>HDD</label>
+        <input type="text" name="hdd" value="<%= product ? product.hdd : '' %>" placeholder="VD: 2TB HDD 7200rpm">
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group">
+        <label>Tản nhiệt</label>
+        <input type="text" name="cooler" value="<%= product ? product.cooler : '' %>" placeholder="VD: Tản nước 360mm">
+    </div>
+    <div class="form-group">
+        <label>Hãng sản xuất</label>
+        <input type="text" name="brand" value="<%= product ? product.brand : '' %>" placeholder="VD: ASUS, MSI, Gigabyte...">
+    </div>
+</div>
+
+
+<!-- ===== THÔNG SỐ MÀN HÌNH ===== -->
+<h4 style="margin-top:25px;padding-top:15px;border-top:1px solid #eee;color:#e74c3c;">
+    <i class="fas fa-desktop"></i> Thông số màn hình (nếu là màn hình)
+</h4>
+
+<!-- Hàng 1: Kích thước + Tấm nền -->
+<div class="form-row">
+    <div class="form-group">
+        <label>Kích thước màn hình</label>
+        <select name="screenSize">
+            <option value="">-- Chọn kích thước --</option>
+            <option value="21.5" <%= product && product.screenSize === '21.5' ? 'selected' : '' %>>21.5 inch</option>
+            <option value="24" <%= product && product.screenSize === '24' ? 'selected' : '' %>>24 inch</option>
+            <option value="27" <%= product && product.screenSize === '27' ? 'selected' : '' %>>27 inch</option>
+            <option value="32" <%= product && product.screenSize === '32' ? 'selected' : '' %>>32 inch</option>
+            <option value="34" <%= product && product.screenSize === '34' ? 'selected' : '' %>>34 inch (Ultrawide)</option>
+            <option value="49" <%= product && product.screenSize === '49' ? 'selected' : '' %>>49 inch (Super Ultrawide)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Tấm nền</label>
+        <select name="panelType">
+            <option value="">-- Chọn tấm nền --</option>
+            <option value="IPS" <%= product && product.panelType === 'IPS' ? 'selected' : '' %>>IPS</option>
+            <option value="VA" <%= product && product.panelType === 'VA' ? 'selected' : '' %>>VA</option>
+            <option value="TN" <%= product && product.panelType === 'TN' ? 'selected' : '' %>>TN</option>
+            <option value="OLED" <%= product && product.panelType === 'OLED' ? 'selected' : '' %>>OLED</option>
+            <option value="Nano IPS" <%= product && product.panelType === 'Nano IPS' ? 'selected' : '' %>>Nano IPS</option>
+            <option value="Fast IPS" <%= product && product.panelType === 'Fast IPS' ? 'selected' : '' %>>Fast IPS</option>
+            <option value="Rapid IPS" <%= product && product.panelType === 'Rapid IPS' ? 'selected' : '' %>>Rapid IPS</option>
+        </select>
+    </div>
+</div>
+
+<!-- Hàng 2: Độ phân giải + Tần số quét -->
+<div class="form-row">
+    <div class="form-group">
+        <label>Độ phân giải</label>
+        <select name="resolution">
+            <option value="">-- Chọn độ phân giải --</option>
+            <option value="1920x1080 (Full HD)" <%= product && product.resolution === '1920x1080 (Full HD)' ? 'selected' : '' %>>1920x1080 (Full HD)</option>
+            <option value="2560x1440 (2K QHD)" <%= product && product.resolution === '2560x1440 (2K QHD)' ? 'selected' : '' %>>2560x1440 (2K QHD)</option>
+            <option value="3840x2160 (4K UHD)" <%= product && product.resolution === '3840x2160 (4K UHD)' ? 'selected' : '' %>>3840x2160 (4K UHD)</option>
+            <option value="3440x1440 (Ultrawide)" <%= product && product.resolution === '3440x1440 (Ultrawide)' ? 'selected' : '' %>>3440x1440 (Ultrawide)</option>
+            <option value="2560x1080 (Ultrawide FHD)" <%= product && product.resolution === '2560x1080 (Ultrawide FHD)' ? 'selected' : '' %>>2560x1080 (Ultrawide FHD)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Tần số quét</label>
+        <select name="refreshRate">
+            <option value="">-- Chọn tần số quét --</option>
+            <option value="60Hz" <%= product && product.refreshRate === '60Hz' ? 'selected' : '' %>>60Hz</option>
+            <option value="75Hz" <%= product && product.refreshRate === '75Hz' ? 'selected' : '' %>>75Hz</option>
+            <option value="100Hz" <%= product && product.refreshRate === '100Hz' ? 'selected' : '' %>>100Hz</option>
+            <option value="120Hz" <%= product && product.refreshRate === '120Hz' ? 'selected' : '' %>>120Hz</option>
+            <option value="144Hz" <%= product && product.refreshRate === '144Hz' ? 'selected' : '' %>>144Hz</option>
+            <option value="165Hz" <%= product && product.refreshRate === '165Hz' ? 'selected' : '' %>>165Hz</option>
+            <option value="180Hz" <%= product && product.refreshRate === '180Hz' ? 'selected' : '' %>>180Hz</option>
+            <option value="200Hz" <%= product && product.refreshRate === '200Hz' ? 'selected' : '' %>>200Hz</option>
+            <option value="240Hz" <%= product && product.refreshRate === '240Hz' ? 'selected' : '' %>>240Hz</option>
+            <option value="360Hz" <%= product && product.refreshRate === '360Hz' ? 'selected' : '' %>>360Hz</option>
+        </select>
+    </div>
+</div>
+
+<!-- Hàng 3: Thời gian phản hồi (full width) -->
+<div class="form-row" style="grid-template-columns: 1fr;">
+    <div class="form-group">
+        <label>Thời gian phản hồi (GTG)</label>
+        <select name="responseTime">
+            <option value="">-- Chọn thời gian phản hồi --</option>
+            <option value="1ms" <%= product && product.responseTime === '1ms' ? 'selected' : '' %>>1ms</option>
+            <option value="2ms" <%= product && product.responseTime === '2ms' ? 'selected' : '' %>>2ms</option>
+            <option value="4ms" <%= product && product.responseTime === '4ms' ? 'selected' : '' %>>4ms</option>
+            <option value="5ms" <%= product && product.responseTime === '5ms' ? 'selected' : '' %>>5ms</option>
+            <option value="1ms MPRT" <%= product && product.responseTime === '1ms MPRT' ? 'selected' : '' %>>1ms MPRT</option>
+            <option value="0.5ms" <%= product && product.responseTime === '0.5ms' ? 'selected' : '' %>>0.5ms</option>
+        </select>
+    </div>
+</div>
+
+<!-- ===== KẾT THÚC THÔNG SỐ MÀN HÌNH ===== -->
+                        
+                        <div class="form-group">
+                            <label>Mô tả sản phẩm</label>
+                            <textarea name="description" rows="5"><%= product ? product.description : '' %></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Thông số kỹ thuật chi tiết</label>
+                            <textarea name="specifications" rows="5"><%= product ? product.specifications : '' %></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Lưu sản phẩm</button>
+                            <a href="/admin/products" class="btn-cancel"><i class="fas fa-times"></i> Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.style.display = 'block';
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Xem trước">';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

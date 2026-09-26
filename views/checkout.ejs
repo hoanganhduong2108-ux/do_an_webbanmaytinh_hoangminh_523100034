@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - PC Market</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo">
+                    <a href="/"><span class="logo-pc">PC</span><span class="logo-m">MDZ</span></a>
+                </div>
+                <div class="search-bar">
+                    <form action="/search">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm...">
+                        <button><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name">
+                                <i class="fas fa-user-circle"></i> <%= user.fullName %>
+                                <% if (user.role === 'staff') { %>
+                                    <span style="background:#e74c3c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">STAFF</span>
+                                <% } %>
+                                <% if (user.role === 'admin') { %>
+                                    <span style="background:#007bff;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị hệ thống</a>
+                                <% } %>
+                                <% if (user.role === 'staff') { %>
+                                    <a href="/staff/dashboard" style="background:#fff5f5;color:#e74c3c !important;font-weight:600;">
+                                        <i class="fas fa-user-tie"></i> Trang nhân viên
+                                    </a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login">Đăng nhập</a>
+                        <a href="/register">Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i><span id="cart-count">0</span></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming"><i class="fas fa-gamepad"></i> PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation"><i class="fas fa-microchip"></i> PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-van-phong"><i class="fas fa-briefcase"></i> PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=laptop"><i class="fas fa-laptop"></i> LAPTOP</a></li>
+                    <li><a href="/products?category=man-hinh-may-tinh"><i class="fas fa-desktop"></i> MÀN HÌNH MÁY TÍNH</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh"><i class="fas fa-microchip"></i> LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">
+                    <i class="fas fa-phone-alt"></i> Hotline: 099.999.9999
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <h1 class="page-title"><i class="fas fa-credit-card"></i> THANH TOÁN</h1>
+            
+            <form method="POST" action="/checkout" id="checkoutForm">
+                <div class="checkout-layout">
+                    <div class="checkout-info">
+                        <div class="checkout-card">
+                            <h3><i class="fas fa-truck"></i> Thông tin giao hàng</h3>
+                            <div class="form-group">
+                                <label>Họ và tên <span class="required">*</span></label>
+                                <input type="text" name="fullName" value="<%= user.fullName %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email <span class="required">*</span></label>
+                                <input type="email" name="email" value="<%= user.email %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Số điện thoại <span class="required">*</span></label>
+                                <input type="tel" name="phone" value="<%= user.phone %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Địa chỉ giao hàng <span class="required">*</span></label>
+                                <input type="text" name="address" value="<%= user.address %>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Ghi chú đơn hàng</label>
+                                <textarea name="note" rows="3" placeholder="Nhập ghi chú cho đơn hàng..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-order">
+                        <div class="checkout-card">
+                            <h3><i class="fas fa-receipt"></i> Đơn hàng của bạn</h3>
+                            
+                            <div class="order-items">
+                                <% for(var i = 0; i < cart.length; i++) { %>
+                                    <div class="order-item">
+                                        <div class="order-item-info">
+                                            <span class="order-item-name"><%= cart[i].name %></span>
+                                            <span class="order-item-quantity">x<%= cart[i].quantity %></span>
+                                        </div>
+                                        <span class="order-item-price"><%= (cart[i].price * cart[i].quantity).toLocaleString('vi-VN') %>đ</span>
+                                    </div>
+                                <% } %>
+                            </div>
+                            
+                            <div class="voucher-section">
+                                <h4><i class="fas fa-ticket-alt"></i> Mã giảm giá</h4>
+                                <p class="voucher-note">* Có thể dùng 1 mã giảm giá + 1 mã miễn phí vận chuyển</p>
+                                
+                                <div class="voucher-input-group">
+                                    <input type="text" id="voucherCode" placeholder="Nhập mã giảm giá" autocomplete="off">
+                                    <button type="button" class="btn-apply" onclick="addVoucher()">Thêm mã</button>
+                                </div>
+                                <div id="voucherMessage" class="voucher-message"></div>
+                                
+                                <% if (vouchers && vouchers.length > 0) { %>
+                                    <div class="voucher-list">
+                                        <p class="voucher-label">Mã có thể áp dụng:</p>
+                                        <div class="voucher-tags">
+                                            <% for(var i = 0; i < vouchers.length; i++) { %>
+                                                <span class="voucher-tag" onclick="addVoucherByCode('<%= vouchers[i].code %>')">
+                                                    <%= vouchers[i].code %>
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                
+                                <div id="appliedVouchersContainer"></div>
+                            </div>
+                            
+                            <div class="points-info">
+                                <i class="fas fa-star"></i> Điểm tích lũy của bạn: <strong><%= userPoints.toLocaleString('vi-VN') %></strong> điểm
+                                <small>(Tích 1.000đ được 1 điểm)</small>
+                            </div>
+                            
+                            <div class="order-summary">
+                                <div class="summary-row">
+                                    <span>Tạm tính</span>
+                                    <span id="subtotalDisplay"><%= subtotal.toLocaleString('vi-VN') %>đ</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Phí vận chuyển</span>
+                                    <span id="shippingFeeDisplay"><%= shippingFee.toLocaleString('vi-VN') %>đ</span>
+                                </div>
+                                <div class="summary-row discount-row" id="discountRow" style="display:none;">
+                                    <span>Giảm giá</span>
+                                    <span id="discountAmountDisplay" style="color:#27ae60;">-0đ</span>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <span>Tổng cộng</span>
+                                    <span id="totalDisplay" class="total-amount"><%= total.toLocaleString('vi-VN') %>đ</span>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-methods">
+                                <h4><i class="fas fa-wallet"></i> Phương thức thanh toán</h4>
+                                <div class="payment-options">
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="cod" checked>
+                                        <span><i class="fas fa-money-bill-wave"></i> Thanh toán khi nhận hàng (COD)</span>
+                                    </label>
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="banking">
+                                        <span><i class="fas fa-university"></i> Chuyển khoản ngân hàng</span>
+                                    </label>
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="momo">
+                                        <span><i class="fas fa-mobile-alt"></i> Ví MoMo</span>
+                                    </label>
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="zalopay">
+                                        <span><i class="fas fa-mobile-alt"></i> ZaloPay</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" name="voucherCode" id="hiddenVoucherCode" value="">
+                            
+                            <button type="submit" class="btn btn-primary btn-block place-order-btn">
+                                <i class="fas fa-check-circle"></i> ĐẶT HÀNG NGAY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+     <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>1A, Gốc Đề, Q.Hai Bà Trưng, Hà Nội</p>
+                    <p>Tel: 034.567.8912</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>1A Cửu Long, P.15, Q.10, TP.HCM</p>
+                    <p>Tel: 099.999.9999</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Tin tức</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .checkout-layout { display: flex; gap: 30px; margin: 30px 0; }
+        .checkout-info { flex: 1; }
+        .checkout-order { width: 420px; }
+        .checkout-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .checkout-card h3 {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e74c3c;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .required { color: #e74c3c; }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-item-name { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .order-item-quantity { color: #666; margin-left: 10px; }
+        .order-item-price { color: #e74c3c; font-weight: 500; }
+        
+        .voucher-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .voucher-section h4 { margin-bottom: 8px; font-size: 14px; }
+        .voucher-note { font-size: 11px; color: #e74c3c; margin-bottom: 12px; }
+        .voucher-input-group { display: flex; gap: 10px; }
+        .voucher-input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .btn-apply {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-apply:hover { background: #c0392b; }
+        .voucher-message { font-size: 12px; margin-top: 8px; }
+        .voucher-message.success { color: #27ae60; }
+        .voucher-message.error { color: #e74c3c; }
+        .voucher-list { margin-top: 12px; }
+        .voucher-label { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .voucher-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .voucher-tag {
+            padding: 4px 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .voucher-tag:hover { background: #e74c3c; color: white; }
+        
+        .applied-voucher {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #d4edda;
+            border-radius: 8px;
+            color: #155724;
+            margin-top: 10px;
+        }
+        .applied-voucher i { margin-right: 8px; }
+        .remove-voucher {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #155724;
+            font-size: 14px;
+        }
+        
+        .points-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: #fff3cd;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .points-info i { color: #ffc107; margin-right: 8px; }
+        .order-summary {
+            margin: 20px 0;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .total-row {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 2px solid #eee;
+            margin-top: 5px;
+            padding-top: 15px;
+        }
+        .total-amount { color: #e74c3c; }
+        .discount-row { color: #27ae60; }
+        
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .payment-option:hover {
+            border-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .btn-block { width: 100%; text-align: center; }
+        .place-order-btn {
+            margin-top: 10px;
+            padding: 14px;
+            font-size: 16px;
+        }
+        @media (max-width: 992px) {
+            .checkout-layout { flex-direction: column; }
+            .checkout-order { width: 100%; }
+        }
+    </style>
+
+    <script>
+        const ORIGINAL_SUBTOTAL = <%= subtotal %>;
+        const ORIGINAL_SHIPPING_FEE = <%= shippingFee %>;
+        
+        let appliedVouchers = [];
+        let currentTotalDiscount = 0;
+        let currentShippingFee = ORIGINAL_SHIPPING_FEE;
+        
+        function addVoucher() {
+            const code = document.getElementById('voucherCode').value.trim().toUpperCase();
+            if (!code) {
+                showVoucherMessage('Vui lòng nhập mã giảm giá', 'error');
+                return;
+            }
+            
+            if (appliedVouchers.some(v => v.code === code)) {
+                showVoucherMessage('Mã này đã được thêm rồi', 'error');
+                return;
+            }
+            
+            const applyBtn = document.querySelector('.btn-apply');
+            applyBtn.disabled = true;
+            applyBtn.innerHTML = 'Đang xử lý...';
+            
+            // Gửi code dưới dạng string (không phải mảng) để API dễ xử lý
+            fetch('/check-voucher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code, subtotal: ORIGINAL_SUBTOTAL })
+            })
+            .then(res => res.json())
+            .then(data => {
+                applyBtn.disabled = false;
+                applyBtn.innerHTML = 'Thêm mã';
+                
+                if (data.success) {
+                    // Kiểm tra nếu đã có mã giảm giá rồi và mã mới không phải freeship
+                    const hasDiscount = appliedVouchers.some(v => v.type !== 'freeship');
+                    const isFreeship = data.voucher.type === 'freeship';
+                    
+                    if (hasDiscount && !isFreeship) {
+                        showVoucherMessage('Chỉ được dùng 1 mã giảm giá. Bạn có thể dùng thêm 1 mã miễn phí vận chuyển', 'error');
+                        return;
+                    }
+                    
+                    appliedVouchers.push(data.voucher);
+                    calculateTotalDiscount();
+                    updateVoucherDisplay();
+                    updateTotalDisplay();
+                    document.getElementById('voucherCode').value = '';
+                    document.getElementById('voucherCode').focus();
+                    showVoucherMessage('Đã thêm mã thành công!', 'success');
+                    document.getElementById('hiddenVoucherCode').value = appliedVouchers.map(v => v.code).join(',');
+                } else {
+                    showVoucherMessage(data.message || 'Không thể áp dụng mã này', 'error');
+                }
+            })
+            .catch(err => {
+                applyBtn.disabled = false;
+                applyBtn.innerHTML = 'Thêm mã';
+                showVoucherMessage('Lỗi khi thêm mã', 'error');
+            });
+        }
+        
+        function calculateTotalDiscount() {
+            currentTotalDiscount = 0;
+            let hasFreeShip = false;
+            
+            for (const v of appliedVouchers) {
+                if (v.type === 'freeship') {
+                    hasFreeShip = true;
+                } else {
+                    currentTotalDiscount += v.discountAmount;
+                }
+            }
+            
+            currentShippingFee = hasFreeShip ? 0 : ORIGINAL_SHIPPING_FEE;
+            currentTotalDiscount = Math.min(currentTotalDiscount, ORIGINAL_SUBTOTAL);
+        }
+        
+        function addVoucherByCode(code) {
+            document.getElementById('voucherCode').value = code;
+            addVoucher();
+        }
+        
+        function removeVoucher(codeToRemove) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            appliedVouchers = appliedVouchers.filter(v => v.code !== codeToRemove);
+            calculateTotalDiscount();
+            updateVoucherDisplay();
+            updateTotalDisplay();
+            document.getElementById('hiddenVoucherCode').value = appliedVouchers.map(v => v.code).join(',');
+            showVoucherMessage('Đã xóa mã thành công', 'success');
+        }
+        
+        function updateVoucherDisplay() {
+            const container = document.getElementById('appliedVouchersContainer');
+            if (appliedVouchers.length > 0) {
+                container.innerHTML = appliedVouchers.map(v => `
+                    <div class="applied-voucher">
+                        <span><i class="fas fa-check-circle"></i> ${v.name}</span>
+                        <button type="button" class="remove-voucher" onclick="removeVoucher('${v.code}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+                container.style.display = 'block';
+            } else {
+                container.innerHTML = '';
+                container.style.display = 'none';
+            }
+        }
+        
+        function updateTotalDisplay() {
+    const finalTotal = ORIGINAL_SUBTOTAL + currentShippingFee - currentTotalDiscount;
+    
+    if (currentTotalDiscount > 0) {
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('discountAmountDisplay').innerHTML = '- ' + currentTotalDiscount.toLocaleString('vi-VN') + 'đ';
+    } else {
+        document.getElementById('discountRow').style.display = 'none';
+    }
+    
+    document.getElementById('shippingFeeDisplay').innerHTML = currentShippingFee.toLocaleString('vi-VN') + 'đ';
+    document.getElementById('totalDisplay').innerHTML = finalTotal.toLocaleString('vi-VN') + 'đ';
+    
+    // CẬP NHẬT HIDDEN INPUT - QUAN TRỌNG
+    const voucherCodes = appliedVouchers.map(v => v.code).join(',');
+    document.getElementById('hiddenVoucherCode').value = voucherCodes;
+    console.log('Voucher codes gửi đi:', voucherCodes);
+}
+
+        function showVoucherMessage(msg, type) {
+            const msgDiv = document.getElementById('voucherMessage');
+            msgDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + msg;
+            msgDiv.className = 'voucher-message ' + type;
+            setTimeout(() => {
+                msgDiv.innerHTML = '';
+                msgDiv.className = 'voucher-message';
+            }, 3000);
+        }
+    </script>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>

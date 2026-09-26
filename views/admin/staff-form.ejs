@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== LAYOUT ===== */
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 25px; color: #ccc; text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        
+        /* ===== FORM ===== */
+        .form-card {
+            background: white; border-radius: 16px;
+            padding: 30px; max-width: 700px; margin: 0 auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .form-card h1 { margin-bottom: 25px; font-size: 22px; color: #1a1a2e; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; margin-bottom: 8px;
+            font-weight: 600; font-size: 14px; color: #333;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231,76,60,0.1);
+        }
+        .required { color: #e74c3c; }
+        .btn-primary {
+            background: #e74c3c; color: white;
+            padding: 12px 25px; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 16px; font-weight: 600;
+        }
+        .btn-primary:hover { background: #c0392b; }
+        .btn-cancel {
+            background: #6c757d; color: white;
+            padding: 12px 25px; border: none; border-radius: 8px;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-cancel:hover { background: #5a6268; }
+        .help-text { font-size: 12px; color: #888; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-store"></i>
+                <h3>PC MDZ Admin</h3>
+                <p>Chào, <%= user.fullName %></p>
+            </div>
+            <a href="/admin/dashboard" class="sidebar-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+            <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+            <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+            <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+            <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+            <a href="/admin/staffs" class="sidebar-link active"><i class="fas fa-user-tie"></i> Nhân viên</a>
+            <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+            <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+            <hr class="sidebar-divider">
+            <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+            <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+        </div>
+        
+        <div class="admin-main">
+            <a href="/admin/staffs" style="color:#666;text-decoration:none;display:inline-block;margin-bottom:20px;">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+            
+            <div class="form-card">
+                <h1>
+                    <i class="fas fa-user-tie"></i>
+                    <%= staff ? 'Sửa nhân viên' : 'Thêm nhân viên mới' %>
+                </h1>
+                
+                <form method="POST" action="/admin/staffs<%= staff ? '/' + staff._id + '?_method=PUT' : '' %>">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Họ tên <span class="required">*</span></label>
+                            <input type="text" name="fullName" value="<%= staff ? staff.fullName : '' %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" name="email" value="<%= staff ? staff.email : '' %>" <%= staff ? 'disabled' : 'required' %>>
+                            <% if (staff) { %>
+                                <div class="help-text">Không thể sửa email</div>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>SĐT <span class="required">*</span></label>
+                            <input type="tel" name="phone" value="<%= staff ? staff.phone : '' %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã nhân viên</label>
+                            <input type="text" name="staffCode" value="<%= staff ? staff.staffCode : '' %>" placeholder="VD: NV001">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Địa chỉ <span class="required">*</span></label>
+                        <input type="text" name="address" value="<%= staff ? staff.address : '' %>" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bộ phận</label>
+                            <select name="department">
+                                <option value="sales" <%= staff && staff.department === 'sales' ? 'selected' : '' %>>Kinh doanh</option>
+                                <option value="support" <%= staff && staff.department === 'support' ? 'selected' : '' %>>Hỗ trợ</option>
+                                <option value="warehouse" <%= staff && staff.department === 'warehouse' ? 'selected' : '' %>>Kho</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày vào làm</label>
+                            <input type="date" name="joinedAt" value="<%= staff && staff.joinedAt ? new Date(staff.joinedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>">
+                        </div>
+                    </div>
+                    
+                    <% if (!staff) { %>
+                    <div class="form-group">
+                        <label>Mật khẩu <span class="required">*</span></label>
+                        <input type="password" name="password" minlength="6" required>
+                        <div class="help-text">Tối thiểu 6 ký tự</div>
+                    </div>
+                    <% } %>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 25px;">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> <%= staff ? 'Cập nhật' : 'Tạo tài khoản' %>
+                        </button>
+                        <a href="/admin/staffs" class="btn-cancel">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

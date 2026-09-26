@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - PC Market</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .product-detail { margin: 40px 0; }
+        .product-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .product-gallery { display: flex; flex-direction: column; }
+        .main-image {
+            background: #f8f9fa;
+            border-radius: 16px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .main-image img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .product-title { font-size: 32px; margin-bottom: 15px; color: #1a1a2e; }
+        .product-meta { display: flex; gap: 20px; margin-bottom: 20px; color: #666; font-size: 14px; }
+        .product-categories i { margin-right: 5px; }
+        .product-prices {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .current-price { color: #e74c3c; font-size: 28px; font-weight: 700; }
+        .old-price { color: #999; text-decoration: line-through; font-size: 16px; }
+        .product-stock { margin-bottom: 25px; }
+        .in-stock { color: #27ae60; font-weight: 500; }
+        .out-of-stock { color: #e74c3c; font-weight: 500; }
+        .specs-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+        .specs-summary h3 { margin-bottom: 12px; font-size: 18px; }
+        .specs-summary ul { list-style: none; }
+        .specs-summary li { padding: 8px 0; font-size: 14px; border-bottom: 1px solid #eee; }
+        .specs-summary li:last-child { border-bottom: none; }
+        .quantity-selector { display: flex; align-items: center; gap: 12px; margin-right: 20px; }
+        .qty-btn {
+            width: 38px;
+            height: 38px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .qty-btn:hover { background: #e74c3c; color: white; border-color: #e74c3c; }
+        .quantity-selector input {
+            width: 70px;
+            height: 38px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .product-actions-detail { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .add-to-cart-detail {
+            flex: 1;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .add-to-cart-detail:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(231,76,60,0.4); }
+        .product-description {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .tabs { display: flex; gap: 15px; border-bottom: 2px solid #eee; margin-bottom: 25px; }
+        .tab-button {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            border-radius: 8px 8px 0 0;
+        }
+        .tab-button.active { color: #e74c3c; border-bottom: 3px solid #e74c3c; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .specs-table { width: 100%; border-collapse: collapse; }
+        .specs-table th, .specs-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .specs-table th { width: 30%; background: #f8f9fa; font-weight: 600; }
+        .related-products { margin-top: 50px; }
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #e74c3c;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        @media (max-width: 992px) { .product-detail-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo"><a href="/"><span class="logo-pc">PC</span><span class="logo-m">MDZ</span></a></div>
+                <div class="search-bar">
+                    <form action="/search" method="GET">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name">
+                                <i class="fas fa-user-circle"></i> <%= user.fullName %>
+                                <% if (user.role === 'staff') { %>
+                                    <span style="background:#e74c3c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">STAFF</span>
+                                <% } %>
+                                <% if (user.role === 'admin') { %>
+                                    <span style="background:#007bff;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị hệ thống</a>
+                                <% } %>
+                                <% if (user.role === 'staff') { %>
+                                    <a href="/staff/dashboard" style="background:#fff5f5;color:#e74c3c !important;font-weight:600;">
+                                        <i class="fas fa-user-tie"></i> Trang nhân viên
+                                    </a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login">Đăng nhập</a>
+                        <a href="/register">Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i><span id="cart-count">0</span></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU - ĐÃ SỬA (BỎ ICON, CHỈ GIỮ 6 MỤC) -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming"><i class="fas fa-gamepad"></i> PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation"><i class="fas fa-microchip"></i> PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-van-phong"><i class="fas fa-briefcase"></i> PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=laptop"><i class="fas fa-laptop"></i> LAPTOP</a></li>
+                    <li><a href="/products?category=man-hinh-may-tinh"><i class="fas fa-desktop"></i> MÀN HÌNH MÁY TÍNH</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh"><i class="fas fa-microchip"></i> LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">
+                    <i class="fas fa-phone-alt"></i> Hotline: 099.999.9999
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <div class="product-detail">
+                <div class="product-detail-grid">
+                    <div class="product-gallery">
+                        <div class="main-image">
+                            <% if (product.image) { %>
+                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                            <% } else { %>
+                                <div class="no-image-large"><i class="fas fa-desktop fa-5x"></i></div>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="product-info-detail">
+                        <h1 class="product-title"><%= product.name %></h1>
+                        <div class="product-meta">
+                            <span class="product-categories">
+                                <i class="fas fa-folder"></i> 
+                                <% if (product.categories && product.categories.length > 0) { %>
+                                    <%= product.categories.map(c => c.name).join(', ') %>
+                                <% } else { %>
+                                    Chưa phân loại
+                                <% } %>
+                            </span>
+                            <span class="sold-count"><i class="fas fa-chart-line"></i> Đã bán: <%= product.soldCount %></span>
+                        </div>
+                        <div class="product-prices">
+                            <span class="current-price"><%= product.price.toLocaleString('vi-VN') %>đ</span>
+                            <% if (product.oldPrice) { %>
+                                <span class="old-price"><%= product.oldPrice.toLocaleString('vi-VN') %>đ</span>
+                                <span class="discount-percent">-<%= Math.round((1 - product.price / product.oldPrice) * 100) %>%</span>
+                            <% } %>
+                        </div>
+                        <div class="product-stock">
+                            <% if (product.stock > 0) { %>
+                                <span class="in-stock"><i class="fas fa-check-circle"></i> Còn hàng (<%= product.stock %> sản phẩm)</span>
+                            <% } else { %>
+                                <span class="out-of-stock"><i class="fas fa-times-circle"></i> Hết hàng</span>
+                            <% } %>
+                        </div>
+                        
+                        <div class="specs-summary">
+                            <h3>Thông số kỹ thuật</h3>
+                            <ul>
+                                <% if (product.cpu) { %><li><strong>CPU:</strong> <%= product.cpu %></li><% } %>
+                                <% if (product.ram) { %><li><strong>RAM:</strong> <%= product.ram %></li><% } %>
+                                <% if (product.storage) { %><li><strong>Ổ cứng:</strong> <%= product.storage %></li><% } %>
+                                <% if (product.graphics) { %><li><strong>Card đồ họa:</strong> <%= product.graphics %></li><% } %>
+                                <% if (product.mainboard) { %><li><strong>Mainboard:</strong> <%= product.mainboard %></li><% } %>
+                                <% if (product.case) { %><li><strong>Case:</strong> <%= product.case %></li><% } %>
+                                <% if (product.psu) { %><li><strong>PSU:</strong> <%= product.psu %></li><% } %>
+                                <% if (product.hdd) { %><li><strong>HDD:</strong> <%= product.hdd %></li><% } %>
+                                <% if (product.cooler) { %><li><strong>Tản nhiệt:</strong> <%= product.cooler %></li><% } %>
+                                <% if (product.brand) { %><li><strong>Hãng:</strong> <%= product.brand %></li><% } %>
+                                <% if (product.screenSize) { %><li><strong>Kích thước màn hình:</strong> <%= product.screenSize %></li><% } %>
+                                <% if (product.dimensions) { %><li><strong>Kích thước tổng thể:</strong> <%= product.dimensions %></li><% } %>
+                                <% if (product.panelType) { %><li><strong>Tấm nền:</strong> <%= product.panelType %></li><% } %>
+                                <% if (product.resolution) { %><li><strong>Độ phân giải:</strong> <%= product.resolution %></li><% } %>
+                                <% if (product.refreshRate) { %><li><strong>Tần số quét:</strong> <%= product.refreshRate %></li><% } %>
+                            </ul>
+                        </div>
+                        
+                        <div class="product-actions-detail">
+                            <div class="quantity-selector">
+                                <button class="qty-btn" onclick="decreaseQuantity()">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="<%= product.stock %>">
+                                <button class="qty-btn" onclick="increaseQuantity()">+</button>
+                            </div>
+                            <% if (locals.isLoggedIn) { %>
+                                <button class="add-to-cart-detail" onclick="addToCartWithQuantity('<%= product._id %>')">
+                                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                </button>
+                            <% } else { %>
+                                <button class="add-to-cart-detail" onclick="alert('Vui lòng đăng nhập để mua hàng')">
+                                    <i class="fas fa-shopping-cart"></i> Đăng nhập để mua
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-description">
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="openTab(event, 'description')">Mô tả sản phẩm</button>
+                        <button class="tab-button" onclick="openTab(event, 'specifications')">Thông số kỹ thuật</button>
+                    </div>
+                    <div id="description" class="tab-content active">
+                        <p><%= product.description || 'Chưa có mô tả cho sản phẩm này.' %></p>
+                    </div>
+                    <div id="specifications" class="tab-content">
+                        <table class="specs-table">
+                        <tr><th>CPU</th><td><%= product.cpu || 'Chưa cập nhật' %></td></tr>
+                        <tr><th>RAM</th><td><%= product.ram || 'Chưa cập nhật' %></td></tr>
+                        <tr><th>Ổ cứng</th><td><%= product.storage || 'Chưa cập nhật' %></td></tr>
+                        <tr><th>Card đồ họa</th><td><%= product.graphics || 'Chưa cập nhật' %></td></tr>
+                        <% if (product.mainboard) { %><tr><th>Mainboard</th><td><%= product.mainboard %></td></tr><% } %>
+                        <% if (product.case) { %><tr><th>Case</th><td><%= product.case %></td></tr><% } %>
+                        <% if (product.psu) { %><tr><th>PSU</th><td><%= product.psu %></td></tr><% } %>
+                        <% if (product.hdd) { %><tr><th>HDD</th><td><%= product.hdd %></td></tr><% } %>
+                        <% if (product.cooler) { %><tr><th>Tản nhiệt</th><td><%= product.cooler %></td></tr><% } %>
+                        <% if (product.brand) { %><tr><th>Hãng</th><td><%= product.brand %></td></tr><% } %>
+                        <% if (product.screenSize) { %><tr><th>Kích thước màn hình</th><td><%= product.screenSize %></td></tr><% } %>
+                        <% if (product.dimensions) { %><tr><th>Kích thước tổng thể</th><td><%= product.dimensions %></td></tr><% } %>
+                        <% if (product.panelType) { %><tr><th>Tấm nền</th><td><%= product.panelType %></td></tr><% } %>
+                        <% if (product.resolution) { %><tr><th>Độ phân giải</th><td><%= product.resolution %></td></tr><% } %>
+                        <% if (product.refreshRate) { %><tr><th>Tần số quét</th><td><%= product.refreshRate %></td></tr><% } %>
+
+                        <tr><th>Danh mục</th><td>
+                            <% if (product.categories && product.categories.length > 0) { %>
+                                <%= product.categories.map(c => c.name).join(', ') %>
+                            <% } else { %>
+                                Chưa phân loại
+                            <% } %>
+                        </td></tr>
+                        <tr><th>Thông số khác</th><td><%= product.specifications || 'Chưa cập nhật' %></td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <% if (relatedProducts && relatedProducts.length > 0) { %>
+                    <section class="related-products">
+                        <h2 class="section-title">SẢN PHẨM LIÊN QUAN</h2>
+                        <div class="products-grid">
+                            <% for(var i = 0; i < relatedProducts.length; i++) { %>
+                                <div class="product-card">
+                                    <div class="product-image">
+                                        <a href="/product/<%= relatedProducts[i].slug %>">
+                                            <% if (relatedProducts[i].image) { %>
+                                                <img src="<%= relatedProducts[i].image %>" alt="<%= relatedProducts[i].name %>">
+                                            <% } else { %>
+                                                <div class="no-image"><i class="fas fa-desktop fa-2x"></i></div>
+                                            <% } %>
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-name"><a href="/product/<%= relatedProducts[i].slug %>"><%= relatedProducts[i].name %></a></h3>
+                                        <div class="product-price">
+                                            <span class="current-price"><%= relatedProducts[i].price.toLocaleString('vi-VN') %>đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+     <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>1A, Gốc Đề, Q.Hai Bà Trưng, Hà Nội</p>
+                    <p>Tel: 034.567.8912</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>1A Cửu Long, P.15, Q.10, TP.HCM</p>
+                    <p>Tel: 099.999.9999</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Tin tức</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function decreaseQuantity() {
+            var qty = document.getElementById('quantity');
+            if (qty.value > 1) qty.value = parseInt(qty.value) - 1;
+        }
+        function increaseQuantity() {
+            var qty = document.getElementById('quantity');
+            var max = parseInt(qty.max);
+            if (qty.value < max) qty.value = parseInt(qty.value) + 1;
+        }
+        function addToCartWithQuantity(productId) {
+            var qty = document.getElementById('quantity').value;
+            addToCart(productId, qty);
+        }
+        function openTab(event, tabId) {
+            var tabs = document.getElementsByClassName('tab-content');
+            for(var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+            var btns = document.getElementsByClassName('tab-button');
+            for(var i=0; i<btns.length; i++) btns[i].classList.remove('active');
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

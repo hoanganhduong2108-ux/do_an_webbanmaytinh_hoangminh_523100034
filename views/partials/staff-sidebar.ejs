@@ -1,0 +1,32 @@
+<div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Staff</h3>
+        <p>Chào, <%= user.fullName %></p>
+        <p style="font-size:11px;color:#4fc3f7;">Mã NV: <%= user.staffCode || 'N/A' %></p>
+    </div>
+    <a href="/staff/dashboard" class="sidebar-link <%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a href="/staff/orders" class="sidebar-link <%= currentPage === 'orders' ? 'active' : '' %>">
+        <i class="fas fa-shopping-cart"></i> Đơn hàng
+    </a>
+    <a href="/staff/orders/create" class="sidebar-link <%= currentPage === 'order-create' ? 'active' : '' %>">
+        <i class="fas fa-plus-circle"></i> Tạo đơn hộ
+    </a>
+    <a href="/staff/products" class="sidebar-link <%= currentPage === 'products' ? 'active' : '' %>">
+        <i class="fas fa-box"></i> Sản phẩm & kho
+    </a>
+    <a href="/staff/customers" class="sidebar-link <%= currentPage === 'customers' ? 'active' : '' %>">
+        <i class="fas fa-users"></i> Khách hàng
+    </a>
+    <a href="/staff/stock-requests" class="sidebar-link <%= currentPage === 'stock-requests' ? 'active' : '' %>">
+        <i class="fas fa-warehouse"></i> Đề xuất nhập hàng
+    </a>
+    <a href="/staff/reports" class="sidebar-link <%= currentPage === 'reports' ? 'active' : '' %>">
+        <i class="fas fa-chart-bar"></i> Báo cáo cá nhân
+    </a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>

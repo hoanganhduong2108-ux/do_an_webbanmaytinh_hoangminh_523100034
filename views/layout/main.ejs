@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'PC MDZ - Website bán máy tính chuyên nghiệp' %></title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo">
+                    <a href="/">
+                        <span class="logo-pc">PC</span>
+                        <span class="logo-m">MDZ</span>
+                    </a>
+                </div>
+                <div class="search-bar">
+                    <form action="/search" method="GET">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." required>
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name"><i class="fas fa-user-circle"></i> <%= user.fullName %></span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị</a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login">Đăng nhập</a>
+                        <a href="/register">Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU - GIỐNG ẢNH -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/">Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming">PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation">PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-amd-gaming">PC AMD GAMING</a></li>
+                    <li><a href="/products?category=pc-van-phong">PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh">LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">
+                    <i class="fas fa-phone-alt"></i> Hotline: 087.997.9997
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <%- body %>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>83-85 Thái Hà, Đống Đa, Hà Nội</p>
+                    <p>Tel: 036.625.8142</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>83A Cửu Long, Q.10, TP.HCM</p>
+                    <p>Tel: 087.997.9997</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

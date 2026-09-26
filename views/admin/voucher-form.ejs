@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= voucher ? 'Sửa' : 'Thêm' %> mã giảm giá - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .form-container { max-width: 800px; margin: 0 auto; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #e74c3c; }
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .required { color: #e74c3c; }
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .btn-save {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover { background: #c0392b; }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-cancel:hover { background: #5a6268; }
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @media (max-width: 768px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <div class="form-container">
+                <a href="/admin/vouchers" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                </a>
+                
+                <div class="form-card">
+                    <h1 style="margin-bottom: 25px; font-size: 24px;">
+                        <i class="fas fa-ticket-alt"></i> 
+                        <%= voucher ? 'Sửa mã giảm giá' : 'Thêm mã giảm giá mới' %>
+                    </h1>
+                    
+                    <% if (locals.error) { %>
+                        <div class="alert alert-error"><%= error %></div>
+                    <% } %>
+                    
+                    <form method="POST" action="/admin/vouchers<%= voucher ? '/' + voucher._id + '?_method=PUT' : '' %>">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Mã giảm giá <span class="required">*</span></label>
+                                <input type="text" name="code" value="<%= voucher ? voucher.code : '' %>" required 
+                                       placeholder="VD: FREESHIP" style="text-transform:uppercase">
+                                <div class="help-text">Mã sẽ tự động chuyển thành chữ in hoa</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Tên mã <span class="required">*</span></label>
+                                <input type="text" name="name" value="<%= voucher ? voucher.name : '' %>" required 
+                                       placeholder="VD: Miễn phí vận chuyển">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Loại mã <span class="required">*</span></label>
+                                <select name="type" id="voucherType" onchange="toggleDiscountFields()" required>
+                                    <option value="discount_fixed" <%= voucher && voucher.type === 'discount_fixed' ? 'selected' : '' %>>Giảm thẳng tiền</option>
+                                    <option value="discount_percent" <%= voucher && voucher.type === 'discount_percent' ? 'selected' : '' %>>Giảm theo %</option>
+                                    <option value="freeship" <%= voucher && voucher.type === 'freeship' ? 'selected' : '' %>>Miễn phí vận chuyển</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="discountValueGroup">
+                                <label>Giá trị giảm <span class="required" id="discountRequired" style="display:none;">*</span></label>
+                                <input type="number" name="discountValue" id="discountValue" 
+                                       value="<%= voucher ? voucher.discountValue : '' %>" step="1">
+                                <div class="help-text" id="discountValueHint">Nhập số tiền (tối đa 1.000.000đ)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="maxDiscountGroup" style="display:none;">
+                            <label>Giảm tối đa (đ)</label>
+                            <input type="number" name="maxDiscount" id="maxDiscount" 
+                                   value="<%= voucher && voucher.maxDiscount ? voucher.maxDiscount : '' %>" step="1">
+                            <div class="help-text">Áp dụng cho mã giảm %</div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Đơn hàng tối thiểu (đ)</label>
+                                <input type="number" name="minOrderValue" 
+                                       value="<%= voucher ? voucher.minOrderValue : '0' %>" step="1000">
+                                <div class="help-text">0 = không giới hạn</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Số lượng mã</label>
+                                <input type="number" name="quantity" 
+                                       value="<%= voucher ? voucher.quantity : '0' %>" step="1">
+                                <div class="help-text">0 = không giới hạn số lượng</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Mô tả</label>
+                            <textarea name="description" rows="3" 
+                                      placeholder="Mô tả chi tiết về mã giảm giá..."><%= voucher ? voucher.description : '' %></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Ngày bắt đầu <span class="required">*</span></label>
+                                <input type="date" name="startDate" 
+                                       value="<%= voucher ? new Date(voucher.startDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Ngày kết thúc <span class="required">*</span></label>
+                                <input type="date" name="endDate" 
+                                       value="<%= voucher ? new Date(voucher.endDate).toISOString().split('T')[0] : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0] %>" required>
+                            </div>
+                        </div>
+                        
+                        <!-- ĐÃ BỎ 2 DÒNG CHECKBOX: Hiển thị trên trang thanh toán và Kích hoạt mã giảm giá -->
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Lưu mã giảm giá
+                            </button>
+                            <a href="/admin/vouchers" class="btn-cancel">
+                                <i class="fas fa-times"></i> Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleDiscountFields() {
+            const type = document.getElementById('voucherType').value;
+            const discountValueGroup = document.getElementById('discountValueGroup');
+            const maxDiscountGroup = document.getElementById('maxDiscountGroup');
+            const discountValue = document.getElementById('discountValue');
+            const discountRequired = document.getElementById('discountRequired');
+            const hint = document.getElementById('discountValueHint');
+            
+            if (type === 'discount_fixed') {
+                discountValueGroup.style.display = 'block';
+                maxDiscountGroup.style.display = 'none';
+                discountRequired.style.display = 'inline';
+                discountValue.required = true;
+                hint.innerHTML = 'Nhập số tiền giảm (tối đa 1.000.000đ)';
+                discountValue.max = 1000000;
+                discountValue.placeholder = 'VD: 50000';
+            } else if (type === 'discount_percent') {
+                discountValueGroup.style.display = 'block';
+                maxDiscountGroup.style.display = 'block';
+                discountRequired.style.display = 'inline';
+                discountValue.required = true;
+                hint.innerHTML = 'Nhập phần trăm giảm (tối đa 10%)';
+                discountValue.max = 10;
+                discountValue.placeholder = 'VD: 10';
+            } else {
+                discountValueGroup.style.display = 'none';
+                maxDiscountGroup.style.display = 'none';
+                discountRequired.style.display = 'none';
+                discountValue.required = false;
+                discountValue.value = 0;
+                hint.innerHTML = 'Mã miễn phí vận chuyển không cần nhập giá trị';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleDiscountFields();
+        });
+    </script>
+</body>
+</html>

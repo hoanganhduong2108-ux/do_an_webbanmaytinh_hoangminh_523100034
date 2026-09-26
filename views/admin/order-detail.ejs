@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng - PC MDZ Admin</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 25px 0;
+        }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 25px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #666; text-decoration: none; }
+        .back-link:hover { color: #e74c3c; }
+        .action-buttons { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .btn-secondary { background: #6c757d; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; }
+        .btn-primary { background: #007bff; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; }
+        .btn-danger { background: #dc3545; color: white; padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; }
+        .info-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .info-card h3 { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e74c3c; }
+        .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+        .info-label { width: 130px; font-weight: 600; color: #555; }
+        .info-value { flex: 1; color: #333; }
+        .items-table { width: 100%; border-collapse: collapse; }
+        .items-table th, .items-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .items-table th { background: #f8f9fa; font-weight: 600; }
+        .total-amount { color: #e74c3c; font-size: 20px; font-weight: bold; }
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .timeline-date { width: 180px; font-weight: bold; }
+        .timeline-status { flex: 1; }
+        .timeline-note { flex: 2; }
+        .status-pending { color: #856404; }
+        .status-confirmed { color: #004085; }
+        .status-preparing { color: #fd7e14; }
+        .status-shipping { color: #6f42c1; }
+        .status-delivered { color: #155724; }
+        .status-cancelled { color: #721c24; }
+        @media (max-width: 768px) {
+            .timeline-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .timeline-date { width: 100%; }
+            .info-row { flex-direction: column; }
+            .info-label { width: 100%; margin-bottom: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-store"></i>
+        <h3>PC MDZ Admin</h3>
+        <p>Chào, <%= user.fullName %></p>
+    </div>
+    <a href="/admin/dashboard" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/admin/products" class="sidebar-link"><i class="fas fa-box"></i> Sản phẩm</a>
+    <a href="/admin/categories" class="sidebar-link"><i class="fas fa-folder"></i> Danh mục</a>
+    <a href="/admin/orders" class="sidebar-link"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
+    <a href="/admin/customers" class="sidebar-link"><i class="fas fa-users"></i> Khách hàng</a>
+    <a href="/admin/vouchers" class="sidebar-link"><i class="fas fa-ticket-alt"></i> Mã giảm giá</a>
+    <a href="/admin/staffs" class="sidebar-link"><i class="fas fa-user-tie"></i> Nhân viên</a>
+    <a href="/admin/stock-requests" class="sidebar-link"><i class="fas fa-warehouse"></i> Đề xuất nhập hàng</a>
+    <a href="/admin/reports" class="sidebar-link"><i class="fas fa-chart-bar"></i> Báo cáo</a>
+    <hr class="sidebar-divider">
+    <a href="/" class="sidebar-link"><i class="fas fa-home"></i> Về trang chủ</a>
+    <a href="/logout" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+</div>
+        <!-- Main Content -->
+        <div class="admin-main">
+            <a href="/admin/orders" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+            
+            <div class="action-buttons">
+                <a href="/admin/orders/<%= order._id %>/edit" class="btn-primary"><i class="fas fa-edit"></i> Sửa thông tin đơn hàng</a>
+                <% if (order.orderStatus === 'Đã giao hàng' || order.orderStatus === 'Đã hủy') { %>
+                    <button onclick="deleteOrder('<%= order._id %>')" class="btn-danger"><i class="fas fa-trash"></i> Xóa đơn hàng</button>
+                <% } %>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Thông tin đơn hàng -->
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h3>
+                    <div class="info-row"><span class="info-label">Mã đơn hàng:</span><span class="info-value"><%= order.orderCode %></span></div>
+                    <div class="info-row"><span class="info-label">Ngày đặt:</span><span class="info-value"><%= new Date(order.createdAt).toLocaleString('vi-VN') %></span></div>
+                    <div class="info-row"><span class="info-label">Trạng thái:</span>
+                        <span class="info-value">
+                            <form method="POST" action="/admin/orders/<%= order._id %>/status?_method=PUT" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <select name="status" style="padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                                    <option value="Chờ xác nhận" <%= order.orderStatus === 'Chờ xác nhận' ? 'selected' : '' %>>Chờ xác nhận</option>
+                                    <option value="Đã xác nhận" <%= order.orderStatus === 'Đã xác nhận' ? 'selected' : '' %>>Đã xác nhận</option>
+                                    <option value="Đang chuẩn bị" <%= order.orderStatus === 'Đang chuẩn bị' ? 'selected' : '' %>>Đang chuẩn bị</option>
+                                    <option value="Đang giao hàng" <%= order.orderStatus === 'Đang giao hàng' ? 'selected' : '' %>>Đang giao hàng</option>
+                                    <option value="Đã giao hàng" <%= order.orderStatus === 'Đã giao hàng' ? 'selected' : '' %>>Đã giao hàng</option>
+                                    <option value="Đã hủy" <%= order.orderStatus === 'Đã hủy' ? 'selected' : '' %>>Đã hủy</option>
+                                </select>
+                                <input type="text" name="note" placeholder="Ghi chú" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                                <button type="submit" class="btn-primary">Cập nhật</button>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="info-row"><span class="info-label">Phương thức thanh toán:</span><span class="info-value"><%= order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod === 'banking' ? 'Chuyển khoản' : order.paymentMethod === 'momo' ? 'MoMo' : 'ZaloPay' %></span></div>
+                    <div class="info-row"><span class="info-label">Trạng thái thanh toán:</span><span class="info-value"><%= order.paymentStatus === 'Đã thanh toán' ? 'Đã thanh toán' : 'Chưa thanh toán' %></span></div>
+                </div>
+                
+                <!-- Thông tin khách hàng -->
+                <div class="info-card">
+                    <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                    <div class="info-row"><span class="info-label">Họ tên:</span><span class="info-value"><%= order.fullName %></span></div>
+                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value"><%= order.email %></span></div>
+                    <div class="info-row"><span class="info-label">Số điện thoại:</span><span class="info-value"><%= order.phone %></span></div>
+                    <div class="info-row"><span class="info-label">Địa chỉ:</span><span class="info-value"><%= order.address %></span></div>
+                    <div class="info-row"><span class="info-label">Ghi chú:</span><span class="info-value"><%= order.note || 'Không có ghi chú' %></span></div>
+                </div>
+            </div>
+            
+            <!-- Danh sách sản phẩm -->
+            <div class="info-card">
+                <h3><i class="fas fa-boxes"></i> Danh sách sản phẩm</h3>
+                <div style="overflow-x: auto;">
+                    <table class="items-table">
+                        <thead>
+                            <tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th></tr>
+                        </thead>
+                        <tbody>
+                            <% for(var i = 0; i < order.items.length; i++) { %>
+                            <tr>
+                                <td><%= order.items[i].productName %></div></td>
+                                <td><%= order.items[i].price.toLocaleString('vi-VN') %>đ</div></td>
+                                <td><%= order.items[i].quantity %> </div></td>
+                                <td><%= (order.items[i].price * order.items[i].quantity).toLocaleString('vi-VN') %>đ</div></td>
+                             </div>
+                            <% } %>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="3"><strong>Tạm tính:</strong></div><td><%= order.subtotal.toLocaleString('vi-VN') %>đ</div></tr>
+                            <tr><td colspan="3"><strong>Phí vận chuyển:</strong></div><td><%= order.shippingFee.toLocaleString('vi-VN') %>đ</div></tr>
+                            <% if (order.discount > 0) { %>
+                            <tr><td colspan="3"><strong>Giảm giá:</strong></div><td><td style="color:#27ae60;">-<%= order.discount.toLocaleString('vi-VN') %>đ</div></tr>
+                            <% } %>
+                            <tr><td colspan="3"><strong>Tổng cộng:</strong></div><td><td class="total-amount"><%= order.total.toLocaleString('vi-VN') %>đ</div></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Lịch sử cập nhật -->
+            <div class="info-card">
+                <h3><i class="fas fa-history"></i> Lịch sử cập nhật</h3>
+                <% for(var i = 0; i < order.statusHistory.length; i++) { 
+                    var statusClass = '';
+                    if (order.statusHistory[i].status === 'Chờ xác nhận') statusClass = 'status-pending';
+                    else if (order.statusHistory[i].status === 'Đã xác nhận') statusClass = 'status-confirmed';
+                    else if (order.statusHistory[i].status === 'Đang chuẩn bị') statusClass = 'status-preparing';
+                    else if (order.statusHistory[i].status === 'Đang giao hàng') statusClass = 'status-shipping';
+                    else if (order.statusHistory[i].status === 'Đã giao hàng') statusClass = 'status-delivered';
+                    else statusClass = 'status-cancelled';
+                %>
+                <div class="timeline-item">
+                    <div class="timeline-date"><%= new Date(order.statusHistory[i].date).toLocaleString('vi-VN') %></div>
+                    <div class="timeline-status <%= statusClass %>"><%= order.statusHistory[i].status %></div>
+                    <div class="timeline-note"><%= order.statusHistory[i].note %></div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteOrder(orderId) {
+            if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
+                fetch('/admin/orders/' + orderId, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => { if(data.success) window.location.href = '/admin/orders'; else alert(data.message); });
+            }
+        }
+    </script>
+</body>
+</html>

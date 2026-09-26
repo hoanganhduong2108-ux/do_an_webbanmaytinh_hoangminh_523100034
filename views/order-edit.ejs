@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa đơn hàng - PC Market</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="logo"><a href="/"><span class="logo-pc">PC</span><span class="logo-m">MDZ</span></a></div>
+                <div class="search-bar">
+                    <form action="/search">
+                        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm...">
+                        <button><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <% if (locals.isLoggedIn) { %>
+                        <div class="user-dropdown">
+                            <span class="user-name">
+                                <i class="fas fa-user-circle"></i> <%= user.fullName %>
+                                <% if (user.role === 'staff') { %>
+                                    <span style="background:#e74c3c;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">STAFF</span>
+                                <% } %>
+                                <% if (user.role === 'admin') { %>
+                                    <span style="background:#007bff;color:white;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:5px;">ADMIN</span>
+                                <% } %>
+                            </span>
+                            <div class="dropdown-content">
+                                <% if (user.role === 'admin') { %>
+                                    <a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Quản trị hệ thống</a>
+                                <% } %>
+                                <% if (user.role === 'staff') { %>
+                                    <a href="/staff/dashboard" style="background:#fff5f5;color:#e74c3c !important;font-weight:600;">
+                                        <i class="fas fa-user-tie"></i> Trang nhân viên
+                                    </a>
+                                <% } %>
+                                <a href="/account"><i class="fas fa-id-card"></i> Tài khoản</a>
+                                <a href="/orders"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+                                <a href="/cart"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/login">Đăng nhập</a>
+                        <a href="/register">Đăng ký</a>
+                    <% } %>
+                    <a href="/cart" class="cart-icon"><i class="fas fa-shopping-cart"></i><span id="cart-count">0</span></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NAVIGATION MENU - ĐÃ SỬA (BỎ ICON, BỎ LAPTOP) -->
+        <nav class="navigation-bar">
+            <div class="container">
+                <ul class="navigation-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="/products?category=pc-gaming-streaming"><i class="fas fa-gamepad"></i> PC GAMING, STREAMING</a></li>
+                    <li><a href="/products?category=pc-workstation"><i class="fas fa-microchip"></i> PC WORKSTATION</a></li>
+                    <li><a href="/products?category=pc-van-phong"><i class="fas fa-briefcase"></i> PC VĂN PHÒNG</a></li>
+                    <li><a href="/products?category=laptop"><i class="fas fa-laptop"></i> LAPTOP</a></li>
+                    <li><a href="/products?category=man-hinh-may-tinh"><i class="fas fa-desktop"></i> MÀN HÌNH MÁY TÍNH</a></li>
+                    <li><a href="/products?category=linh-kien-may-tinh"><i class="fas fa-microchip"></i> LINH KIỆN MÁY TÍNH</a></li>
+                </ul>
+                <div class="hotline-number">
+                    <i class="fas fa-phone-alt"></i> Hotline: 099.999.9999
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="container">
+            <div class="order-edit-page">
+                <a href="/orders/<%= order._id %>" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                <h1 class="page-title"><i class="fas fa-edit"></i> SỬA ĐƠN HÀNG</h1>
+                <div class="order-code">Mã đơn: <strong><%= order.orderCode %></strong></div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Chỉ có thể sửa khi đơn hàng đang <strong>Chờ xác nhận</strong>
+                </div>
+                
+                <form method="POST" action="/orders/<%= order._id %>?_method=PUT">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Họ tên <span class="required">*</span></label>
+                            <input type="text" name="fullName" value="<%= order.fullName %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email <span class="required">*</span></label>
+                            <input type="email" name="email" value="<%= order.email %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Số điện thoại <span class="required">*</span></label>
+                            <input type="tel" name="phone" value="<%= order.phone %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Địa chỉ <span class="required">*</span></label>
+                            <input type="text" name="address" value="<%= order.address %>" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label><i class="fas fa-comment"></i> Ghi chú</label>
+                            <textarea name="note" rows="3"><%= order.note || '' %></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="order-items-section">
+                        <h3><i class="fas fa-boxes"></i> Sản phẩm</h3>
+                        <table class="items-table">
+                            <thead><tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th></tr></thead>
+                            <tbody>
+                                <% for(var i = 0; i < order.items.length; i++) { %>
+                                <tr>
+                                    <td><%= order.items[i].productName %></td>
+                                    <td><%= order.items[i].price.toLocaleString('vi-VN') %>đ</div></td>
+                                    <td><%= order.items[i].quantity %> </div></td>
+                                    <td class="item-total"><%= (order.items[i].price * order.items[i].quantity).toLocaleString('vi-VN') %>đ</div></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                            <tfoot>
+                                <tr class="subtotal"><td colspan="3">Tạm tính</div><td><%= order.subtotal.toLocaleString('vi-VN') %>đ</div></tr>
+                                <tr class="shipping"><td colspan="3">Phí vận chuyển</div><td><%= order.shippingFee.toLocaleString('vi-VN') %>đ</div></tr>
+                                <% if (order.discount > 0) { %>
+                                <tr class="discount"><td colspan="3">Giảm giá</div><td><td class="text-success">-<%= order.discount.toLocaleString('vi-VN') %>đ</div></tr>
+                                <% } %>
+                                <tr class="total-row"><td colspan="3">Tổng cộng</div><td><td class="total-amount"><%= order.total.toLocaleString('vi-VN') %>đ</div></tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                        <a href="/orders/<%= order._id %>" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+     <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - HÀ NỘI</h4>
+                    <p>1A, Gốc Đề, Q.Hai Bà Trưng, Hà Nội</p>
+                    <p>Tel: 034.567.8912</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-store"></i> SHOWROOM - TP.HCM</h4>
+                    <p>1A Cửu Long, P.15, Q.10, TP.HCM</p>
+                    <p>Tel: 099.999.9999</p>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-info-circle"></i> GIỚI THIỆU</h4>
+                    <a href="#">Giới thiệu công ty</a>
+                    <a href="#">Liên hệ</a>
+                    <a href="#">Tin tức</a>
+                </div>
+                <div class="footer-column">
+                    <h4><i class="fas fa-life-ring"></i> HỖ TRỢ</h4>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 PC MDZ - Cửa hàng máy tính chuyên nghiệp</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

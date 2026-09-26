@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %> - PC MDZ Staff</title>
+    <link rel="stylesheet" href="/css/new-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container { display: flex; }
+        .admin-sidebar { width: 280px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; padding: 25px 0; }
+        .sidebar-header { text-align: center; margin-bottom: 30px; padding: 0 20px; }
+        .sidebar-header i { font-size: 50px; color: #e74c3c; }
+        .sidebar-header h3 { color: white; margin-top: 10px; font-size: 18px; }
+        .sidebar-header p { color: #aaa; font-size: 12px; }
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: #ccc; text-decoration: none; transition: all 0.3s; }
+        .sidebar-link i { width: 20px; font-size: 16px; }
+        .sidebar-link:hover { background: rgba(231,76,60,0.2); color: white; padding-left: 30px; }
+        .sidebar-link.active { background: #e74c3c; color: white; }
+        .sidebar-divider { margin: 20px 25px; border-color: #333; }
+        .admin-main { flex: 1; padding: 25px; background: #f5f7fa; }
+        .form-card { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .form-card h3 { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e74c3c; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;
+        }
+        .required { color: #e74c3c; }
+        .product-search { margin-bottom: 15px; }
+        .product-search input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .products-list { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; }
+        .product-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid #eee; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .product-item:hover { background: #f8f9fa; }
+        .product-item-info { flex: 1; }
+        .product-item-name { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .product-item-price { color: #e74c3c; font-weight: 500; font-size: 13px; }
+        .product-item-stock { color: #666; font-size: 12px; }
+        .btn-add { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+        .btn-add:disabled { background: #ccc; cursor: not-allowed; }
+        .cart-items-table { width: 100%; border-collapse: collapse; }
+        .cart-items-table th, .cart-items-table td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .cart-items-table th { background: #f8f9fa; font-weight: 600; font-size: 13px; }
+        .qty-input { width: 70px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
+        .btn-remove { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background: #e74c3c; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        .btn-primary:hover { background: #c0392b; }
+        .btn-secondary { background: #6c757d; color: white; padding: 12px 25px; border: none; border-radius: 8px; text-decoration: none; display: inline-block; }
+        .total-section { text-align: right; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-top: 15px; }
+        .total-section h3 { color: #e74c3c; font-size: 24px; }
+        .empty-cart { text-align: center; padding: 30px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <%- include('../partials/staff-sidebar', { currentPage: 'order-create' }) %>
+        
+        <div class="admin-main">
+            <h1 style="margin-bottom: 20px;"><i class="fas fa-plus-circle"></i> Tạo đơn hàng hộ khách</h1>
+            <p style="color:#666;margin-bottom:20px;">
+                <i class="fas fa-info-circle"></i> Dành cho khách mua trực tiếp tại showroom. Miễn phí vận chuyển.
+            </p>
+            
+            <form method="POST" action="/staff/orders/create" id="createOrderForm">
+                <input type="hidden" name="items" id="itemsInput">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Cột trái: Chọn sản phẩm -->
+                    <div>
+                        <div class="form-card">
+                            <h3><i class="fas fa-box"></i> Chọn sản phẩm</h3>
+                            <div class="product-search">
+                                <input type="text" id="searchProduct" placeholder="Tìm kiếm sản phẩm..." onkeyup="filterProducts()">
+                            </div>
+                            <div class="products-list" id="productsList">
+                                <% products.forEach(p => { %>
+                                <div class="product-item" data-id="<%= p._id %>" data-name="<%= p.name %>" data-price="<%= p.price %>" data-stock="<%= p.stock %>">
+                                    <div class="product-item-info">
+                                        <div class="product-item-name"><%= p.name %></div>
+                                        <div class="product-item-price"><%= p.price.toLocaleString('vi-VN') %>đ</div>
+                                        <div class="product-item-stock">Tồn: <%= p.stock %></div>
+                                    </div>
+                                    <button type="button" class="btn-add" onclick="addToCart(this)" <%= p.stock <= 0 ? 'disabled' : '' %>>
+                                        <i class="fas fa-plus"></i> Thêm
+                                    </button>
+                                </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cột phải: Thông tin khách + giỏ hàng -->
+                    <div>
+                        <div class="form-card">
+                            <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                            <div class="form-group">
+                                <label>Họ tên <span class="required">*</span></label>
+                                <input type="text" name="customerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Số điện thoại <span class="required">*</span></label>
+                                <input type="tel" name="customerPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="customerEmail" placeholder="Không bắt buộc">
+                            </div>
+                            <div class="form-group">
+                                <label>Địa chỉ</label>
+                                <input type="text" name="customerAddress" value="Mua trực tiếp tại showroom">
+                            </div>
+                            <div class="form-group">
+                                <label>Ghi chú</label>
+                                <textarea name="note" rows="2" placeholder="Ghi chú đơn hàng..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-card">
+                            <h3><i class="fas fa-shopping-cart"></i> Giỏ hàng</h3>
+                            <div id="cartContainer">
+                                <div class="empty-cart">
+                                    <i class="fas fa-shopping-cart fa-2x"></i>
+                                    <p>Chưa có sản phẩm nào</p>
+                                </div>
+                            </div>
+                            <div class="total-section" id="totalSection" style="display:none;">
+                                <span>Tổng cộng: </span>
+                                <h3 id="totalAmount">0đ</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="form-card">
+                            <h3><i class="fas fa-wallet"></i> Phương thức thanh toán</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="paymentMethod" value="cod" checked> COD (Tiền mặt)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="paymentMethod" value="banking"> Chuyển khoản
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="paymentMethod" value="momo"> MoMo
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" name="paymentMethod" value="zalopay"> ZaloPay
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px;">
+                            <button type="submit" class="btn-primary" onclick="return validateForm()">
+                                <i class="fas fa-check-circle"></i> Tạo đơn hàng
+                            </button>
+                            <a href="/staff/orders" class="btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let cart = [];
+        
+        function filterProducts() {
+            const search = document.getElementById('searchProduct').value.toLowerCase();
+            document.querySelectorAll('.product-item').forEach(item => {
+                const name = item.dataset.name.toLowerCase();
+                item.style.display = name.includes(search) ? 'flex' : 'none';
+            });
+        }
+        
+        function addToCart(btn) {
+            const item = btn.closest('.product-item');
+            const id = item.dataset.id;
+            const name = item.dataset.name;
+            const price = parseInt(item.dataset.price);
+            const stock = parseInt(item.dataset.stock);
+            
+            const existing = cart.find(i => i.productId === id);
+            if (existing) {
+                if (existing.quantity < stock) {
+                    existing.quantity++;
+                } else {
+                    alert('Đã đạt số lượng tồn kho tối đa');
+                    return;
+                }
+            } else {
+                cart.push({ productId: id, name, price, quantity: 1, stock });
+            }
+            
+            renderCart();
+        }
+        
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.productId !== id);
+            renderCart();
+        }
+        
+        function updateQuantity(id, qty) {
+            const item = cart.find(i => i.productId === id);
+            if (!item) return;
+            qty = parseInt(qty);
+            if (qty < 1) qty = 1;
+            if (qty > item.stock) {
+                alert('Số lượng vượt quá tồn kho (' + item.stock + ')');
+                qty = item.stock;
+            }
+            item.quantity = qty;
+            renderCart();
+        }
+        
+        function renderCart() {
+            const container = document.getElementById('cartContainer');
+            const totalSection = document.getElementById('totalSection');
+            const totalAmount = document.getElementById('totalAmount');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart fa-2x"></i><p>Chưa có sản phẩm nào</p></div>';
+                totalSection.style.display = 'none';
+                return;
+            }
+            
+            let total = 0;
+            let html = '<table class="cart-items-table"><thead><tr><th>Sản phẩm</th><th>SL</th><th>Tiền</th><th></th></tr></thead><tbody>';
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `<tr>
+                    <td>${item.name}</td>
+                    <td><input type="number" class="qty-input" value="${item.quantity}" min="1" max="${item.stock}" onchange="updateQuantity('${item.productId}', this.value)"></td>
+                    <td>${itemTotal.toLocaleString('vi-VN')}đ</td>
+                    <td><button type="button" class="btn-remove" onclick="removeFromCart('${item.productId}')"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            totalSection.style.display = 'block';
+            totalAmount.textContent = total.toLocaleString('vi-VN') + 'đ';
+            
+            document.getElementById('itemsInput').value = JSON.stringify(cart);
+        }
+        
+        function validateForm() {
+            if (cart.length === 0) {
+                alert('Vui lòng chọn ít nhất 1 sản phẩm');
+                return false;
+            }
+            
+            const name = document.querySelector('input[name="customerName"]').value.trim();
+            const phone = document.querySelector('input[name="customerPhone"]').value.trim();
+            
+            if (!name) { alert('Vui lòng nhập tên khách hàng'); return false; }
+            if (!phone) { alert('Vui lòng nhập số điện thoại'); return false; }
+            
+            document.getElementById('itemsInput').value = JSON.stringify(cart);
+            return true;
+        }
+    </script>
+</body>
+</html>
