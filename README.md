@@ -4,13 +4,15 @@
 
 - **Họ tên:** Hoàng Minh
 - **MSSV:** 523100034
-- **Lớp:** [523100A]
+- **Lớp:** 523100A
 - **GVHD:** Nguyễn Thị Mười Phương
 - **GitHub GVHD:** [MuoiPhuong](https://github.com/MuoiPhuong)
+- **Repository:** [do_an_webbanmaytinh_hoangminh_523100034](https://github.com/hoanganhduong2108-ux/do_an_webbanmaytinh_hoangminh_523100034)
 
 ## 2. Mục tiêu đề tài
 
 Xây dựng website thương mại điện tử bán máy tính, laptop và linh kiện với đầy đủ chức năng:
+
 - Tra cứu, tìm kiếm, lọc sản phẩm theo nhiều tiêu chí
 - Giỏ hàng và quy trình đặt hàng hoàn chỉnh
 - Quản lý tài khoản, đơn hàng, voucher
@@ -20,12 +22,14 @@ Xây dựng website thương mại điện tử bán máy tính, laptop và linh
 ## 3. Chức năng cốt lõi
 
 ### Đối với Khách hàng
+
 - Đăng ký, đăng nhập, quên mật khẩu
 - Xem, tìm kiếm, lọc sản phẩm theo CPU, RAM, SSD, GPU, giá
 - Thêm vào giỏ hàng, đặt hàng, áp dụng voucher
 - Quản lý tài khoản cá nhân và đơn hàng
 
 ### Đối với Nhân viên bán hàng (Staff)
+
 - Xem và xử lý đơn hàng (xác nhận, cập nhật trạng thái)
 - Tạo đơn hàng hộ khách tại showroom
 - Ghi chú nội bộ vào đơn hàng
@@ -34,6 +38,7 @@ Xây dựng website thương mại điện tử bán máy tính, laptop và linh
 - Xem báo cáo cá nhân
 
 ### Đối với Quản trị viên (Admin)
+
 - Dashboard thống kê tổng quan
 - CRUD sản phẩm, danh mục, voucher
 - Quản lý đơn hàng, khách hàng, nhân viên
@@ -51,9 +56,11 @@ Xây dựng website thương mại điện tử bán máy tính, laptop và linh
 - **Charts:** Chart.js
 - **Tools:** VS Code, GitHub Desktop, MongoDB Compass
 
-## 5. Hướng dẫn cài đặt/chạy
+## 5. Hướng dẫn cài đặt và chạy
+
+### Bước 1: Clone repository
+
 ```bash
-Bước 1: Clone repository
 git clone https://github.com/hoanganhduong2108-ux/do_an_webbanmaytinh_hoangminh_523100034.git
 cd do_an_webbanmaytinh_hoangminh_523100034
 
